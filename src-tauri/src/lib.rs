@@ -1,0 +1,420 @@
+//! Haus Culture Özlük Otomasyonu — Tauri kabuğu.
+//! Sayfa (dist/index.html) tek dosyalık HTML programdır; bu kabuk yalnızca
+//! kayıtları Belgeler\<Firma>\veri.json içine güvenle yazar, belgeleri
+//! Belgeler klasörüne kaydeder, menü ve tek-pencere davranışını sağlar.
+
+mod disk;
+
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant};
+
+use serde::Deserialize;
+use serde_json::json;
+use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
+use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
+
+use disk::Disk;
+
+#[derive(Deserialize, Clone)]
+struct Firma {
+    urun_adi: String,
+    klasor_adi: String,
+    surum: String,
+}
+
+struct Durum {
+    disk: Arc<Disk>,
+    firma: Firma,
+    son_belge: Mutex<Option<Instant>>,
+}
+
+const BOOT_JS: &str = r#"
+(function(){
+  var boot = __BOOT__;
+  var hata = null;
+  function rep(e){ if(hata){ try{ hata(String((e && e.message) || e)); }catch(_){} } }
+  function inv(c, a){
+    try { return window.__TAURI_INTERNALS__.invoke(c, a); } catch(e){ return Promise.reject(e); }
+  }
+  window.hausDisk = {
+    load: function(){ return boot.veri; },
+    set: function(k, v){ inv('disk_set', { key: String(k), value: String(v) }).catch(rep); },
+    remove: function(k){ inv('disk_remove', { key: String(k) }).catch(rep); },
+    onError: function(cb){ hata = cb; },
+    info: function(){ return boot.info; }
+  };
+  window.__hausHata = rep;
+
+  // Belge indirme: FileSaver'ın saveAs çağrısı Belgeler klasörüne kaydedilir.
+  function b64(blob){
+    return new Promise(function(res, rej){
+      var r = new FileReader();
+      r.onload = function(){ var s = String(r.result); res(s.slice(s.indexOf(',') + 1)); };
+      r.onerror = function(){ rej(r.error || new Error('okunamadı')); };
+      r.readAsDataURL(blob);
+    });
+  }
+  function kaydet(blob, ad){
+    if(!(blob instanceof Blob)) blob = new Blob([blob]);
+    return b64(blob)
+      .then(function(d){ return inv('belge_kaydet', { name: String(ad || 'belge'), dataB64: d }); })
+      .then(function(msg){ try{ if(typeof toast === 'function') toast(msg); }catch(_){} })
+      .catch(function(e){ try{ alert('Belge kaydedilemedi: ' + String((e && e.message) || e)); }catch(_){} });
+  }
+  var hook = function(blob, ad){ kaydet(blob, ad); };
+  try {
+    Object.defineProperty(window, 'saveAs', { configurable: true, get: function(){ return hook; }, set: function(){} });
+  } catch(_){ window.saveAs = hook; }
+
+  // Dış bağlantılar (WhatsApp vb.) varsayılan tarayıcıda açılır.
+  window.open = function(u){
+    if(u && /^https?:/i.test(String(u))) inv('dis_ac', { url: String(u) }).catch(rep);
+    return null;
+  };
+})();
+"#;
+
+fn boot_betigi(disk: &Disk, firma: &Firma) -> String {
+    let boot = json!({
+        "veri": disk.veri_json(),
+        "info": {
+            "klasor": disk.kok.to_string_lossy(),
+            "not": disk.acilis_notu,
+            "surum": firma.surum,
+        }
+    });
+    BOOT_JS.replace("__BOOT__", &serde_json::to_string(&boot).unwrap_or_else(|_| "{\"veri\":{},\"info\":{}}".into()))
+}
+
+// ---------- Sistem işlemleri ----------
+
+fn klasor_ac(p: &Path) {
+    #[cfg(windows)]
+    {
+        let _ = std::process::Command::new("explorer").arg(p).spawn();
+    }
+    #[cfg(not(windows))]
+    {
+        let _ = std::process::Command::new("xdg-open").arg(p).spawn();
+    }
+}
+
+fn dosyada_goster(p: &Path) {
+    #[cfg(windows)]
+    {
+        let _ = std::process::Command::new("explorer").arg(format!("/select,{}", p.display())).spawn();
+    }
+    #[cfg(not(windows))]
+    {
+        let _ = p;
+    }
+}
+
+/// Yalnızca https, http ve mailto; kullanıcı adı/parola içeren adresler reddedilir.
+fn url_ac(url: &str) -> Result<(), String> {
+    let u = tauri::Url::parse(url).map_err(|e| e.to_string())?;
+    match u.scheme() {
+        "https" | "http" | "mailto" => {}
+        _ => return Err("izin verilmeyen adres".into()),
+    }
+    if !u.username().is_empty() || u.password().is_some() {
+        return Err("izin verilmeyen adres".into());
+    }
+    #[cfg(windows)]
+    {
+        std::process::Command::new("rundll32")
+            .arg("url.dll,FileProtocolHandler")
+            .arg(u.as_str())
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(not(windows))]
+    {
+        std::process::Command::new("xdg-open").arg(u.as_str()).spawn().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+fn gezinme_izni(url: &tauri::Url) -> bool {
+    match url.scheme() {
+        "tauri" | "asset" | "ipc" | "blob" | "data" | "about" => true,
+        "http" | "https" => {
+            let h = url.host_str().unwrap_or("");
+            if matches!(h, "tauri.localhost" | "ipc.localhost" | "asset.localhost" | "localhost" | "127.0.0.1") {
+                true
+            } else {
+                let _ = url_ac(url.as_str());
+                false
+            }
+        }
+        "mailto" => {
+            let _ = url_ac(url.as_str());
+            false
+        }
+        _ => false,
+    }
+}
+
+// ---------- Komutlar ----------
+
+#[tauri::command]
+fn disk_set(key: String, value: String, st: tauri::State<'_, Durum>) {
+    st.disk.set(key, value);
+}
+
+#[tauri::command]
+fn disk_remove(key: String, st: tauri::State<'_, Durum>) {
+    st.disk.remove(&key);
+}
+
+#[tauri::command]
+fn belge_kaydet(name: String, data_b64: String, st: tauri::State<'_, Durum>) -> Result<String, String> {
+    use base64::Engine;
+    let bayt = base64::engine::general_purpose::STANDARD
+        .decode(data_b64.as_bytes())
+        .map_err(|e| e.to_string())?;
+    let yol = st.disk.belge_kaydet(&name, &bayt)?;
+    let ilk = {
+        let mut g = st.son_belge.lock().unwrap();
+        let ilk = g.map_or(true, |t| t.elapsed() > Duration::from_secs(3));
+        *g = Some(Instant::now());
+        ilk
+    };
+    if ilk {
+        dosyada_goster(&yol);
+    }
+    let ust = yol.parent().and_then(|p| p.file_name()).map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
+    let rel = if ust == "Elle alinan" {
+        "Yedekler\\Elle alinan".to_string()
+    } else {
+        format!("Belgeler\\{}", ust)
+    };
+    Ok(format!("Belge kaydedildi: Belgeler\\{}\\{}", st.firma.klasor_adi, rel))
+}
+
+#[tauri::command]
+fn dis_ac(url: String) -> Result<(), String> {
+    url_ac(&url)
+}
+
+// ---------- Menü ----------
+
+fn mesaj(app: &AppHandle, baslik: &str, metin: &str, tur: MessageDialogKind) {
+    app.dialog().message(metin).title(baslik).kind(tur).blocking_show();
+}
+
+fn menu_kur(app: &AppHandle) -> tauri::Result<()> {
+    let dosya = Submenu::with_items(
+        app,
+        "Dosya",
+        true,
+        &[
+            &MenuItem::with_id(app, "veri_ac", "Veri klasörünü aç", true, None::<&str>)?,
+            &MenuItem::with_id(app, "belge_ac", "Belgeler klasörünü aç", true, None::<&str>)?,
+            &MenuItem::with_id(app, "yedek_ac", "Yedekler klasörünü aç", true, None::<&str>)?,
+            &PredefinedMenuItem::separator(app)?,
+            &MenuItem::with_id(app, "geri_yukle", "Yedekten geri yükle…", true, None::<&str>)?,
+            &MenuItem::with_id(app, "yedek_simdi", "Şimdi yedek al", true, None::<&str>)?,
+            &PredefinedMenuItem::separator(app)?,
+            &MenuItem::with_id(app, "cikis", "Çıkış", true, None::<&str>)?,
+        ],
+    )?;
+    let yardim = Submenu::with_items(
+        app,
+        "Yardım",
+        true,
+        &[&MenuItem::with_id(app, "hakkinda", "Hakkında", true, None::<&str>)?],
+    )?;
+    app.set_menu(Menu::with_items(app, &[&dosya, &yardim])?)?;
+    app.on_menu_event(|app, ev| {
+        let id = ev.id().as_ref().to_string();
+        let app = app.clone();
+        let st = app.state::<Durum>();
+        match id.as_str() {
+            "veri_ac" => klasor_ac(&st.disk.kok),
+            "belge_ac" => klasor_ac(&st.disk.belge_dir),
+            "yedek_ac" => klasor_ac(&st.disk.yedek_dir),
+            "cikis" => app.exit(0),
+            "yedek_simdi" => {
+                std::thread::spawn(move || {
+                    let st = app.state::<Durum>();
+                    let _ = st.disk.hemen_yaz();
+                    st.disk.yedek_gerekirse(true);
+                    mesaj(&app, "Yedek", &format!("Yedek alındı.\n{}", st.disk.yedek_dir.display()), MessageDialogKind::Info);
+                });
+            }
+            "hakkinda" => {
+                std::thread::spawn(move || {
+                    let st = app.state::<Durum>();
+                    mesaj(
+                        &app,
+                        &st.firma.urun_adi,
+                        &format!(
+                            "{}\nSürüm {}\nVeri klasörü: {}\n\nVeriler bu bilgisayarda saklanır; internete gönderilmez.",
+                            st.firma.urun_adi,
+                            st.firma.surum,
+                            st.disk.kok.display()
+                        ),
+                        MessageDialogKind::Info,
+                    );
+                });
+            }
+            "geri_yukle" => {
+                std::thread::spawn(move || geri_yukle_akisi(&app));
+            }
+            _ => {}
+        }
+    });
+    Ok(())
+}
+
+fn geri_yukle_akisi(app: &AppHandle) {
+    let st = app.state::<Durum>();
+    let _ = st.disk.hemen_yaz();
+    let secim: Option<PathBuf> = app
+        .dialog()
+        .file()
+        .set_title("Geri yüklenecek yedeği seçin")
+        .set_directory(&st.disk.yedek_dir)
+        .add_filter("Yedek", &["json"])
+        .blocking_pick_file()
+        .and_then(|p| p.into_path().ok());
+    let Some(yol) = secim else { return };
+    let secilen = match disk::dosyadan_oku(&yol) {
+        Some(v) if v.keys().any(|k| k.ends_with("hc_personel")) => v,
+        _ => {
+            mesaj(app, "Geçersiz yedek", "Seçilen dosya bu programın bir yedeği değil.", MessageDialogKind::Error);
+            return;
+        }
+    };
+    let onay = app
+        .dialog()
+        .message("Mevcut veriler seçilen yedekle DEĞİŞTİRİLECEK.\n\nGeri yüklemeden önce mevcut veri ayrıca yedeklenir. Devam edilsin mi?")
+        .title("Geri yükleme")
+        .kind(MessageDialogKind::Warning)
+        .buttons(MessageDialogButtons::OkCancelCustom("Geri yükle".into(), "Vazgeç".into()))
+        .blocking_show();
+    if !onay {
+        return;
+    }
+    match st.disk.geri_yukle(secilen) {
+        Ok(()) => app.restart(),
+        Err(e) => mesaj(app, "Geri yükleme başarısız", &e, MessageDialogKind::Error),
+    }
+}
+
+// ---------- Başlatma ----------
+
+fn hata_bildir(app: &AppHandle, m: &str) {
+    if let Some(w) = app.get_webview_window("main") {
+        let _ = w.eval(&format!(
+            "window.__hausHata&&window.__hausHata({})",
+            serde_json::to_string(m).unwrap_or_else(|_| "\"hata\"".into())
+        ));
+    }
+}
+
+pub fn run() {
+    let firma: Firma = serde_json::from_str(include_str!("../firma.json")).expect("firma.json okunamadı");
+
+    let mut b = tauri::Builder::default();
+    b = b.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+        if let Some(w) = app.get_webview_window("main") {
+            let _ = w.unminimize();
+            let _ = w.set_focus();
+        }
+    }));
+    b = b.plugin(tauri_plugin_dialog::init());
+
+    let firma_k = firma.clone();
+    b.invoke_handler(tauri::generate_handler![disk_set, disk_remove, belge_kaydet, dis_ac])
+        .setup(move |app| {
+            let kok = match std::env::var("HAUS_VERI_KLASORU") {
+                Ok(v) if !v.is_empty() => PathBuf::from(v),
+                _ => app.path().document_dir()?.join(&firma_k.klasor_adi),
+            };
+            let disk = Arc::new(Disk::ac(kok, &firma_k.surum));
+            let script = boot_betigi(&disk, &firma_k);
+            let acilis_notu = disk.acilis_notu.clone();
+            let kok_goster = disk.kok.display().to_string();
+            app.manage(Durum {
+                disk: disk.clone(),
+                firma: firma_k.clone(),
+                son_belge: Mutex::new(None),
+            });
+
+            let mut wb = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
+                .title(firma_k.urun_adi.clone())
+                .inner_size(1440.0, 900.0)
+                .min_inner_size(1050.0, 680.0)
+                .center()
+                .initialization_script(&script)
+                .on_navigation(|u| gezinme_izni(u));
+
+            #[cfg(debug_assertions)]
+            if let Ok(p) = std::env::var("HAUS_TEST_SCRIPT") {
+                if let Ok(js) = std::fs::read_to_string(p) {
+                    let calisti = std::sync::atomic::AtomicBool::new(false);
+                    wb = wb.on_page_load(move |wv, payload| {
+                        if matches!(payload.event(), tauri::webview::PageLoadEvent::Finished)
+                            && !calisti.swap(true, std::sync::atomic::Ordering::SeqCst)
+                        {
+                            let _ = wv.eval(&js);
+                        }
+                    });
+                }
+            }
+
+            wb.build()?;
+
+            // Arka plan yazıcısı: bekleyen değişiklikler 300 ms sonra atomik olarak yazılır.
+            let h = app.handle().clone();
+            let d = disk.clone();
+            std::thread::spawn(move || {
+                let mut son_bildirim: Option<Instant> = None;
+                loop {
+                    std::thread::sleep(Duration::from_millis(100));
+                    if let Err(m) = d.tick() {
+                        if son_bildirim.map_or(true, |t| t.elapsed() > Duration::from_secs(30)) {
+                            son_bildirim = Some(Instant::now());
+                            hata_bildir(&h, &m);
+                        }
+                    }
+                }
+            });
+
+            menu_kur(app.handle())?;
+
+            if !acilis_notu.is_empty() {
+                let h = app.handle().clone();
+                std::thread::spawn(move || {
+                    std::thread::sleep(Duration::from_millis(1200));
+                    mesaj(&h, "Veri kurtarma", &format!("{}\n\nKlasör: {}", acilis_notu, kok_goster), MessageDialogKind::Warning);
+                });
+            }
+
+            #[cfg(debug_assertions)]
+            if let Ok(ms) = std::env::var("HAUS_TEST_EXIT_MS") {
+                if let Ok(ms) = ms.parse::<u64>() {
+                    let h = app.handle().clone();
+                    std::thread::spawn(move || {
+                        std::thread::sleep(Duration::from_millis(ms));
+                        h.exit(0);
+                    });
+                }
+            }
+            Ok(())
+        })
+        .build(tauri::generate_context!())
+        .expect("uygulama başlatılamadı")
+        .run(|app, ev| {
+            if let RunEvent::Exit = ev {
+                if let Some(st) = app.try_state::<Durum>() {
+                    let _ = st.disk.hemen_yaz();
+                    st.disk.yedek_gerekirse(true);
+                }
+            }
+        });
+}

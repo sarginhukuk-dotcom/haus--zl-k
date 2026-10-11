@@ -1,0 +1,32 @@
+[package]
+name = "haus-ozluk"
+version = "20.26.0"
+description = "Haus Culture Özlük Otomasyonu"
+authors = ["Av. İsmail Sarğın"]
+edition = "2021"
+
+[lib]
+name = "haus_ozluk_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+base64 = "0.22"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

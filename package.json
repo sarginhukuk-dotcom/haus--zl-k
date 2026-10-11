@@ -1,0 +1,13 @@
+{
+  "name": "haus-culture-ozluk",
+  "version": "20.26.0",
+  "private": true,
+  "scripts": {
+    "tauri": "tauri",
+    "icons": "tauri icon app-icon.png",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}
