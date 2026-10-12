@@ -128,7 +128,9 @@ fn klasor_ac(p: &Path) {
 fn dosyada_goster(p: &Path) {
     #[cfg(windows)]
     {
-        let _ = std::process::Command::new("explorer").arg(format!("/select,{}", p.display())).spawn();
+        use std::os::windows::process::CommandExt;
+        // Boşluklu yollar için argüman Gezgin'e olduğu gibi (tırnaklı) iletilmeli.
+        let _ = std::process::Command::new("explorer").raw_arg(format!("/select,\"{}\"", p.display())).spawn();
     }
     #[cfg(not(windows))]
     {
