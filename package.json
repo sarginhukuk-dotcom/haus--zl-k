@@ -1,6 +1,6 @@
 {
   "name": "haus-culture-ozluk",
-  "version": "20.27.0",
+  "version": "20.28.0",
   "private": true,
   "scripts": {
     "tauri": "tauri",
