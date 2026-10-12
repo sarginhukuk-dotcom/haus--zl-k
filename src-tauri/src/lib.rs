@@ -373,6 +373,9 @@ pub fn run() {
                     }
                 }
             }
+            // Verisi daha önce oluşmuş klasör önce denenir; uyarı yalnızca ilk geçişte gösterilir.
+            let ilk_aday = adaylar.first().cloned();
+            adaylar.sort_by_key(|k| !k.join("veri.json").exists());
             let mut hatalar: Vec<String> = Vec::new();
             let mut yedek_not = String::new();
             let mut secilen: Option<PathBuf> = None;
@@ -381,7 +384,8 @@ pub fn run() {
                 match Disk::hazirla(k) {
                     Ok(()) => {
                         secilen = Some(k.clone());
-                        if i > 0 {
+                        let _ = i;
+                        if Some(k) != ilk_aday.as_ref() && !k.join("veri.json").exists() {
                             yedek_not = format!("Belgeler klasörüne yazılamadığı için veriler şu klasörde tutuluyor:\n{}\n\n(Ayrıntı: {})", k.display(), hatalar.join("; "));
                         }
                         break;
