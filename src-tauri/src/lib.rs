@@ -39,14 +39,37 @@ const BOOT_JS: &str = r#"
   function inv(c, a){
     try { return window.__TAURI_INTERNALS__.invoke(c, a); } catch(e){ return Promise.reject(e); }
   }
+  // Sayfa yeniden yüklenirse (location.reload) gömülü ilk veri eskimiştir; son durum
+  // oturum belleğinden alınır ve diske yeniden gönderilir.
+  var veri = boot.veri, cur = {}, fark = false;
+  try {
+    var snap = sessionStorage.getItem('__haus_snap');
+    if(snap){
+      sessionStorage.removeItem('__haus_snap');
+      var o = JSON.parse(snap);
+      if(o && typeof o === 'object'){ veri = o; fark = true; }
+    }
+  } catch(_){}
+  Object.keys(veri).forEach(function(k){ cur[k] = String(veri[k]); });
+  function snapAl(){ try{ sessionStorage.setItem('__haus_snap', JSON.stringify(cur)); }catch(_){} }
+  window.addEventListener('pagehide', snapAl);
+  window.addEventListener('beforeunload', snapAl);
   window.hausDisk = {
-    load: function(){ return boot.veri; },
-    set: function(k, v){ inv('disk_set', { key: String(k), value: String(v) }).catch(rep); },
-    remove: function(k){ inv('disk_remove', { key: String(k) }).catch(rep); },
+    load: function(){ return veri; },
+    set: function(k, v){ cur[String(k)] = String(v); inv('disk_set', { key: String(k), value: String(v) }).catch(rep); },
+    remove: function(k){ delete cur[String(k)]; inv('disk_remove', { key: String(k) }).catch(rep); },
     onError: function(cb){ hata = cb; },
     info: function(){ return boot.info; }
   };
   window.__hausHata = rep;
+  if(fark){
+    var gonder = function(){
+      var eski = boot.veri || {};
+      Object.keys(cur).forEach(function(k){ if(String(eski[k]) !== cur[k]) inv('disk_set', { key: k, value: cur[k] }).catch(rep); });
+      Object.keys(eski).forEach(function(k){ if(!(k in cur)) inv('disk_remove', { key: k }).catch(rep); });
+    };
+    window.addEventListener('DOMContentLoaded', function(){ setTimeout(gonder, 50); });
+  }
 
   // Belge indirme: FileSaver'ın saveAs çağrısı Belgeler klasörüne kaydedilir.
   function b64(blob){
