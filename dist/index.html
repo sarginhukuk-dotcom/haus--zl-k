@@ -1177,7 +1177,6 @@ details:not(.v212-w),#detayIcerik details{border-left:1px solid var(--hc-line)!i
             <option value="performansDegerlendirme">Performans Değerlendirme Formu</option>
             <option value="satinAlma">Satın Alma Talep Formu</option>
             <option value="zimmet">Zimmet Teslim Tutanağı (yeniden)</option>
-            <option value="kuralTeblig">İşyeri İç Yönetmeliği ve Kural Bildirim Tutanağı (yeniden)</option>
             <option value="icYonetmelikTam">İşyeri İç Yönetmeliği (Tam Metin — Yazdır/Panoya As)</option>
           </select>
         </div>
@@ -1933,7 +1932,7 @@ function belirliSureFesihNotu(p, harf){
 function calismaDuzeniEkMaddesi(c){
   c.push(govde('Hafta tatili: İşçiye, yedi günlük zaman dilimi içinde kesintisiz en az yirmidört saat dinlenme (hafta tatili) verilir. Vardiya düzeni gereği hafta tatili haftanın farklı günlerine rastlayabilir ve işyeri çalışma çizelgesinde önceden gösterilir. Hafta tatilinde çalışılması hâlinde çalışma kayıt altına alınır ve ücreti 4857 sayılı Kanun hükümlerine göre ayrıca ödenir.', {girinti:false}));
   c.push(govde('Ulusal bayram ve genel tatil günleri: İşçi, işin niteliği gereği ulusal bayram ve genel tatil günlerinde de çalışabileceğini kabul eder. Bu günlerde çalışılan her gün için, 4857 sayılı Kanun\'un 47. maddesi uyarınca ayrıca bir günlük ücret ödenir.', {girinti:false}));
-  c.push(govde('Çalışma kayıtları: Giriş-çıkış saatleri, fazla çalışma, hafta tatili ve genel tatil çalışmaları İşverence tutulan vardiya/puantaj kayıtlarıyla belirlenir. İşçi, kendisine sunulan aylık puantaj kayıtlarını kontrol ederek imzalar; kayıtlara ilişkin itirazını yazılı olarak bildirir.', {girinti:false}));
+  c.push(govde('Çalışma kayıtları: Giriş-çıkış saatleri, fazla çalışma, hafta tatili ve genel tatil çalışmaları İşverence tutulan vardiya/puantaj kayıtlarıyla belirlenir; kayıtların imzalanması ve kayıtlara itiraz usulü, "Ücret ve Mali Hükümler" bölümündeki "Çalışma ve ücret kayıtları" bendinde düzenlenmiştir.', {girinti:false}));
 }
 function kismiSureFazlaCalismaNotu(p, harf){
   if(p.calismaSekli!=='kismi') return null;
@@ -1985,11 +1984,11 @@ function ekHukumlerMaddesi(c, no, tur){
   const sec=t=>{ n=0; c.push(altBaslik(no+'/'+t)); };
 
   sec('A) Yönetim Hakkı ve Çalışma Düzeni');
-  b('Görev tanımı sınırlayıcı değildir. İşveren; işin sevk ve idaresi, çalışma düzeni, vardiya, iş yeri kuralları ve iş sağlığı güvenliği talimatlarını belirleme ve bunlara uyulmasını denetleme hakkına sahiptir; İşçi, İşverenin iş görme ve işyeri düzenine ilişkin talimatlarına uymakla yükümlüdür. İşçinin mesleki niteliğine ve unvanına uygun, benzer nitelikteki iş ve görevler de görev tanımına dâhildir; iş sözleşmesinin esaslı unsurlarını değiştiren hâllerde 4857 sayılı Kanun\'un 22. maddesi saklıdır.');
-  b('Ara dinlenme süreleri çalışma süresinden sayılmaz; bu sürelerde İşçi işyerinden ayrılmakta serbesttir. Ara dinlenmesinin kullandırıldığı puantaj ve vardiya kayıtlarıyla belgelenir (4857 m.68).');
+  b('Görev tanımı sınırlayıcı değildir. İşveren; işin sevk ve idaresi, çalışma düzeni, vardiya, iş yeri kuralları ve iş sağlığı güvenliği talimatlarını belirleme ve bunlara uyulmasını denetleme hakkına sahiptir; İşçinin mesleki niteliğine ve unvanına uygun, benzer nitelikteki iş ve görevler de görev tanımına dâhildir (4857 m.22 saklıdır).');
+  b('Ara dinlenme süreleri ve vardiya planlaması İşveren tarafından kanuni asgari sürelere uyularak belirlenir; ara dinlenme süreleri çalışma süresinden sayılmaz; bu sürelerde İşçi işyerinden ayrılmakta serbesttir. Ara dinlenmesinin kullandırıldığı puantaj ve vardiya kayıtlarıyla belgelenir (4857 m.68).');
   b('İşçi, vardiya ve çalışma saatlerine uyar; işe başlama ve bitiş saatlerini kendisi kaydeder. İşyerinde bulunma tek başına çalışma anlamına gelmez; özel işlerle, mola dışı bekleme ile veya görev dışı geçen süreler çalışma süresinden sayılmaz.');
   b('Fazla çalışma, İşverenin veya yetkili amirin talimatı ya da onayıyla yapılır ve puantaja kaydedilir. Talimat veya onay olmaksızın, İşverenin bilgisi dışında yapılan ek çalışma süreleri fazla çalışma sayılmaz; İşverenin bilgisi ve izni dâhilinde yapılan fazla çalışma ise 4857 sayılı Kanun\'un 41. maddesine göre ücretlendirilir. İşçi talep ederse, fazla çalışma ücreti yerine, çalıştığı her bir saat için bir saat otuz dakika serbest zaman kullanabilir; bu hak, fazla çalışmanın yapıldığı tarihten itibaren altı ay içinde kullanılır.');
-  b('Yıllık ücretli izin: İzin dönemleri iş durumu ve işyeri düzeni gözetilerek İşverenle birlikte belirlenir; izin, bir bölümü on günden az olmamak üzere bölünerek kullandırılabilir. İzin kullanımı, İşçinin imzaladığı izin formu ve izin dönüş kaydıyla belgelenir. Kullandırılan izne ilişkin ücretin izin başlangıcından önce ödendiği veya avans olarak verildiği, izin formu ve banka kayıtlarıyla ispatlanır.');
+  b('Yıllık ücretli izin: İzin dönemleri iş durumu ve işyeri düzeni gözetilerek İşverenle birlikte belirlenir; izin, bir bölümü on günden az olmamak üzere bölünerek kullandırılabilir. İzin kullanımı, İşçinin imzaladığı izin formu ve izin dönüş kaydıyla belgelenir. İzin ücretinin Madde 9 uyarınca ödendiği izin formu ve banka kayıtlarıyla ispatlanır.');
   b('Mazeret ve rapor bildirimi: İşçi, hastalık veya başka bir mazeret nedeniyle işe gelemeyeceğini aynı gün içinde, mümkünse mesai başlangıcından önce amirine bildirir; istirahat raporunu en geç kırk sekiz saat içinde İşverene teslim eder. Süresinde bildirilmeyen ve belgelenmeyen devamsızlık mazeretsiz sayılır. Raporlu olduğu süre içinde İşçi, rapora aykırı biçimde başka bir işte çalışamaz; aksi hâlde 4857 sayılı Kanun\'un 25/II maddesi saklıdır.');
   b('İşçi, İşverenin yaptıracağı işe giriş ve periyodik sağlık muayenelerine katılır, sağlık durumunda işe etki eden değişiklikleri bildirir; İşverenin düzenlediği iş sağlığı ve güvenliği, hijyen ve mesleki eğitimlere katılmak zorundadır. Eğitime katılmama veya eğitim kaydını imzalamaktan kaçınma, talimata aykırılık sayılır.');
 
@@ -2006,7 +2005,6 @@ function ekHukumlerMaddesi(c, no, tur){
   if(tur==='yonetim') b('İşçi; kendisine bağlı personelin devam, puantaj, performans ve disiplin kayıtlarını doğru ve zamanında tutar, işyeri kuralları ile mevzuata aykırılıkları derhâl İşverene bildirir ve yetki sınırlarını aşan işlemlerden şahsen sorumlu olur.');
 
   sec('C) Ücret ve Mali Hükümler');
-  b('Hatalı veya fazla yapılan ödemeler İşçi tarafından iade edilir (TBK m.77 vd.); İşveren bu bedeli, İşçinin yazılı onayı ile veya kanunen izin verilen sınırlar içinde ücret alacaklarından mahsup edebilir.');
   b('İşçi, ücret ve parasal haklarına ilişkin bilgileri iş huzurunu bozacak biçimde iş arkadaşlarıyla tartışmamayı kabul eder; İşçinin hukuki haklarını aramak amacıyla yetkili merciler ve vekilleriyle paylaşması bu hükmün kapsamı dışındadır.');
   b('Sosyal yardımlar: İşverenin yemek, ulaşım, prim ve benzeri sosyal yardımları, ayrıca yazılı olarak ücretin eki hâline getirilmedikçe, İşverenin takdirine bağlı yardım niteliğinde olup yalnızca fiilen çalışılan günlerle sınırlı olarak verilir; yıllık izin, rapor, devamsızlık veya ücretsiz izin günlerinde ödenmez. Yardımların kapsamının değiştirilmesi hâlinde İşçi yazılı olarak bilgilendirilir.');
   b('İşverenin masrafını üstlendiği, makul ölçüyü aşan mesleki eğitim, kurs veya sertifika programları için İşçiden ayrıca yazılı eğitim taahhüdü alınabilir; bu taahhütte öngörülen süre dolmadan İşçinin kendi isteğiyle veya haklı neden olmaksızın ayrılması hâlinde eğitim bedeli, çalışılmayan süre oranında iade edilir.');
@@ -2016,18 +2014,19 @@ function ekHukumlerMaddesi(c, no, tur){
   sec('D) Bildirim ve İspat');
   b('Tebligat: İşçinin işe giriş belgelerinde ve özlük dosyasında bildirdiği adres, telefon ve varsa e-posta bilgileri tebligat adresidir. Adres değişikliği yazılı bildirilmedikçe eski adrese yapılan bildirim geçerlidir. İşveren; ihtar, savunma istemi, disiplin kararı, fesih ve benzeri bildirimlerini işyerinde elden imza karşılığı yapabilir; İşçinin imzadan kaçınması hâlinde bu durum, en az iki kişinin imzaladığı tutanakla tespit edilir ve bildirim yapılmış sayılır. İşveren ayrıca bildirimi noter aracılığıyla veya iadeli taahhütlü posta ile yapabilir; işyerine devamsız İşçiye bildirim, ayrıca bildirdiği adrese yapılır.');
   b('Delil sözleşmesi: Taraflar, 6100 sayılı HMK m.193 uyarınca; puantaj ve vardiya çizelgeleri, giriş-çıkış (PDKS) kayıtları, kasa/POS ve stok kayıtları, bordro ve banka dekontları, imzalı tutanak ve formlar, tebliğ belgeleri, işyeri e-posta ve mesajlaşma yazışmaları ile aydınlatma yapılmış güvenlik kamerası kayıtlarının aralarındaki uyuşmazlıkta delil olarak kullanılabileceğini kabul eder. Bu kabul, kamu düzenine ilişkin hükümleri ve aksinin kanuna uygun delillerle ispatı hakkını ortadan kaldırmaz.');
-  b('Güvenlik kayıtları ve aydınlatma: İşçi, işyerinde güvenlik kamerası ve giriş-çıkış kayıt sistemlerinin bulunduğunu; 6698 sayılı KVKK kapsamındaki aydınlatma metninin kendisine verildiğini kabul eder. Kayıtlar; işyeri güvenliği, somut olayların incelenmesi ve hakların korunması amacıyla, ölçülülük ilkesine uygun olarak disiplin süreçlerinde ve yargı mercileri önünde kullanılabilir. Tuvalet, soyunma ve dinlenme alanlarında kayıt yapılmaz.');
+  b('Güvenlik kayıtları: İşçi, işyerinde güvenlik kamerası ve giriş-çıkış kayıt sistemlerinin bulunduğunu kabul eder (KVKK aydınlatması için bkz. F(c)). Kayıtlar; işyeri güvenliği, somut olayların incelenmesi ve hakların korunması amacıyla, ölçülülük ilkesine uygun olarak disiplin süreçlerinde ve yargı mercileri önünde kullanılabilir. Tuvalet, soyunma ve dinlenme alanlarında kayıt yapılmaz.');
   b('İşverenin, sözleşmenin sona ermesinden sonra da işçiliğe ilişkin belge ve kayıtları yasal saklama ve zamanaşımı süreleri boyunca saklama ve hukuki uyuşmazlıklarda kullanma hakkı saklıdır.');
 
   sec('E) Fesih ve Sona Ermeye İlişkin Hükümler');
-  b('Aşağıdaki hâller örnek niteliğinde olup sınırlayıcı değildir; 4857 sayılı Kanun\'un 25/II maddesi uyarınca İşverene haklı nedenle ve tazminatsız fesih hakkı verir: işe girişte gerçeğe aykırı bilgi veya belge verilmesi; İşverene, ailesine, amirlere veya iş arkadaşlarına hakaret, sataşma, tehdit ve taciz; hırsızlık, kasa veya tahsilat usulsüzlüğü, güveni kötüye kullanma, sır açıklama ve sahtekârlık; alkol veya uyuşturucu etkisinde çalışma; ihtara rağmen görevin yerine getirilmemesi; kanuni eşiğe ulaşan devamsızlık; iş güvenliği tedbirlerine aykırı davranış; kasten veya ihmalle İşverene otuz günlük ücreti aşan zarar verilmesi. İç Yönetmelikteki disiplin cetveli saklıdır.');
-  b('İşçi, bildirim sürelerine uymaksızın sözleşmeyi feshederse veya işyerini terk ederse, İşverenin 4857 sayılı Kanun\'un 17. maddesi uyarınca ihbar tazminatı ve uğradığı diğer zararı talep hakkı saklıdır; bu bedel İşçinin yazılı onayıyla ücret alacaklarından mahsup edilebilir.');
-  b('Sözleşmenin sona ermesinde İşçi devir-teslim yapar; zimmetli eşya, belge ve erişim araçlarını iade eder ve ilişik kesme tutanağını imzalar. Alacaklara ilişkin ibraname, TBK m.420 uyarınca sözleşmenin sona ermesinden itibaren en az bir ay geçtikten sonra, alacak kalemlerini gösteren dökümlü ve ödemenin banka yoluyla yapıldığını belgeleyen biçimde düzenlenir.');
+  b('Aşağıdaki hâller örnek niteliğinde olup sınırlayıcı değildir; 4857 sayılı Kanun\'un 25/II maddesi uyarınca İşverene haklı nedenle ve tazminatsız fesih hakkı verir: İşverene, ailesine, amirlere veya iş arkadaşlarına hakaret, sataşma, tehdit ve taciz; hırsızlık, kasa veya tahsilat usulsüzlüğü, güveni kötüye kullanma, sır açıklama ve sahtekârlık; ihtara rağmen görevin yerine getirilmemesi; kanuni eşiğe ulaşan devamsızlık; iş güvenliği tedbirlerine aykırı davranış; kasten veya ihmalle İşverene otuz günlük ücreti aşan zarar verilmesi. İşe girişte verilen bilgilerin gerçeğe aykırılığı ile alkol/uyuşturucu etkisine ilişkin yukarıdaki hükümler ve İç Yönetmelikteki disiplin cetveli saklıdır.');
+  b('İşçi, bildirim sürelerine uymaksızın sözleşmeyi feshederse veya işyerini terk ederse, İşverenin 4857 sayılı Kanun\'un 17. maddesi uyarınca ihbar tazminatı ve uğradığı diğer zararı talep hakkı saklıdır; bu bedel de Madde 3(d) uyarınca mahsup edilebilir.');
+  b('Sözleşmenin sona ermesinde İşçi devir-teslim yapar, belge ve erişim araçlarını iade eder (zimmetli eşya bakımından Madde 2 ve 3 hükümleri saklıdır) ve ilişik kesme tutanağını imzalar. Alacaklara ilişkin ibraname, TBK m.420 uyarınca sözleşmenin sona ermesinden itibaren en az bir ay geçtikten sonra, alacak kalemlerini gösteren dökümlü ve ödemenin banka yoluyla yapıldığını belgeleyen biçimde düzenlenir.');
 
   sec('F) Genel Hükümler');
-  b('Yazılı değişiklik: Bu sözleşmede ve eklerinde yapılacak değişiklikler yazılı olarak yapılır. Taraflar arasında daha önce yapılan sözlü ve yazılı görüşmeler bu sözleşmenin imzalanmasıyla yerini sözleşmeye bırakır. İşverenin takdirine bağlı olarak yaptığı ödeme ve uygulamalar, yazılı olarak ayrıca kararlaştırılmadıkça İşçi lehine sözleşmesel hak doğurmaz.');
+  b('Yazılı değişiklik: Bu sözleşmede ve eklerinde yapılacak değişiklikler yazılı olarak yapılır. Taraflar arasında daha önce yapılan sözlü ve yazılı görüşmeler bu sözleşmenin imzalanmasıyla yerini sözleşmeye bırakır.');
   b('Kısmi geçersizlik: Sözleşmenin herhangi bir hükmünün geçersiz sayılması hâlinde, bu hüküm geçerli olabilecek en geniş kapsamda uygulanır ve diğer hükümler geçerliliğini korur (TBK m.27/2). Hâkimin bir hükmü sınırlaması veya indirmesi, hükmün sınırlanmış hâliyle geçerliliğini etkilemez.');
-  b('Okuma ve nüsha teslimi: İşçi; bu sözleşmeyi, İşyeri İç Yönetmeliği\'ni, Sadakat, Gizlilik ve Rekabet Yasağı Sözleşmesi\'ni (varsa) ve KVKK aydınlatma metnini okuduğunu ve anladığını, sorularının cevaplandığını, imzalamadan önce inceleme imkânı bulduğunu ve sözleşmenin bir nüshasını elden teslim aldığını beyan eder.');
+  b('Okuma ve nüsha teslimi: İşçi; bu sözleşmeyi, Sadakat, Gizlilik ve Rekabet Yasağı Sözleşmesi\'ni (varsa) ve 6698 sayılı KVKK kapsamındaki aydınlatma metnini (güvenlik kamerası bilgilendirmesi dâhil) kendisine verildiğini, okuduğunu ve anladığını, sorularının cevaplandığını, imzalamadan önce inceleme imkânı bulduğunu ve sözleşmenin bir nüshasını elden teslim aldığını beyan eder.');
+  b('İşyeri İç Yönetmeliği: İşyeri İç Yönetmeliği ve işyeri güvenlik kuralları, işyerinde tüm çalışanların görebileceği yerlere asılarak ilan edilmiştir; kâğıt israfının önlenmesi amacıyla ayrıca imzaya sunulmamaktadır. İşçi, İç Yönetmeliğin ve işyeri güvenlik kurallarının kendisine okunduğunu ve anlatıldığını, içeriğini anladığını; disiplin usulünün, yazılı savunma hakkının ve işyeri talimat ve duyurularının yazılı, dijital veya ilan yoluyla iletilebileceğinin kendisine anlatıldığını kabul ve beyan eder. İç Yönetmelik işbu sözleşmenin eki ve ayrılmaz parçasıdır; ayrıca imzalanmamış olması İşçiye tebliğ edildiği ve bağlayıcı olduğu sonucunu değiştirmez. Sonraki değişiklikler ilan tarihinden itibaren uygulanır (4857 m.22 saklıdır).');
 }
 
 function mutfakIsSozlesmesi(p){
@@ -2054,26 +2053,24 @@ function mutfakIsSozlesmesi(p){
   c.push(bent('d','İşçi, görevi nedeniyle zilyetliğine bırakılan demirbaş, ekipman ve malzemenin muhafazasından, kendi kusuruyla oluşacak hasar ve ziyandan sorumludur.'));
   c.push(bent('e','İşçi, iş sözleşmesi hangi nedenle sona ererse ersin, fesih/istifa tarihinde kendisine teslim edilmiş olan iş alet ve edevatını, kişisel koruyucu donanımı ve varsa işyerine ait diğer malzemeleri eksiksiz iade eder ve mesai bitiminde işyerini terk eder.'));
   c.push(bent('f','İşçi, mesai saatleri içinde işin gerekleri dışında telefon, tablet ve benzeri cihazlarla ilgilenmemeyi; İşverenin bu konuda alacağı makul tedbirlere uymayı kabul eder.'));
-  c.push(bent('g','İşçi, ikametgâh adresinde meydana gelecek değişikliği en geç bir hafta içinde İşverene yazılı olarak bildirir; bildirilmeyen adres değişikliğinde işyerindeki adres yasal tebligat adresi sayılır.'));
+  c.push(bent('g','İşçi, ikametgâh adresinde meydana gelecek değişikliği en geç bir hafta içinde İşverene yazılı olarak bildirir.'));
   c.push(bent('h','İşçi, işe giriş sırasında sözlü veya yazılı olarak verdiği bilgilerin doğru olduğunu; bu bilgilerin gerçeğe aykırı olduğunun sonradan anlaşılması hâlinde bunun İşveren açısından haklı fesih sebebi teşkil edeceğini kabul eder.'));
   c.push(bent('ı','İşçi, İşverenin belirlediği mutfak forması, hijyen bonesi/filesi ve kişisel bakım/görünüm kurallarına uyar.'));
 
   c.push(maddeBaslik('MADDE 3) ÜCRET VE ÖDEME'));
   c.push(bent('a','İşçi ücreti brüttür ve kural olarak İşçi adına açılacak banka hesabına ödenir.'));
   c.push(bent('b','Ücrete yapılacak zam İşverenin takdirindedir.'));
-  c.push(bent('c','İşverenin süreklilik arz etmeyen, teşvik amaçlı ödemeleri kazanılmış hak niteliğinde değildir.'));
-  c.push(bent('d','İşçinin İşverene olan borçlarının ücret ve tazminat alacaklarından mahsubu, borcun doğumundan sonra İşçinin vereceği yazılı onayla ve kanunun mahsuba izin verdiği sınırlar içinde yapılır.'));
-  c.push(bent('e','İşçiye zimmetle teslim edilen ve zimmet tutanağında bedeli ayrıca belirtilmiş olan (kişisel koruyucu donanım niteliğinde bulunmayan) eşyanın iş sözleşmesi sona erdiğinde iade edilmemesi hâlinde, İşverenin bu eşyanın bedelini talep hakkı saklıdır; bu bedel ancak İşçinin işten ayrılış işlemleri sırasında ayrıca vereceği yazılı onay ile ücretinden veya varsa kıdem/ihbar tazminatından mahsup edilebilir.'));
+  c.push(bent('c','İşverenin süreklilik arz etmeyen, teşvik amaçlı ve takdire bağlı ödemeleri ile uygulamaları, yazılı olarak ayrıca kararlaştırılmadıkça kazanılmış hak niteliğinde değildir ve İşçi lehine sözleşmesel hak doğurmaz.'));
+  c.push(bent('d','İşçinin İşverene olan borçları ile hatalı veya fazla yapılan ödemeler İşçi tarafından iade edilir (TBK m.77 vd.); bu bedeller, borcun doğumundan sonra İşçinin vereceği yazılı onayla veya kanunen izin verilen sınırlar içinde ücret ve tazminat alacaklarından mahsup edilebilir.'));
+  c.push(bent('e','Zimmet tutanağında bedeli belirtilmiş (kişisel koruyucu donanım niteliğinde olmayan) eşyanın sözleşme sona erdiğinde iade edilmemesi hâlinde, İşverenin bedeli talep hakkı saklıdır; bedel ancak İşçinin ayrılış işlemleri sırasında vereceği yazılı onayla ücret veya kıdem/ihbar tazminatından mahsup edilebilir.'));
   c.push(bent('f','Ücret ayda bir, ücret döneminin bitimini izleyen ayın onuncu gününe kadar İşçinin banka hesabına ödenir.'));
-  c.push(bent('g','İşçinin ücret bordrosunu imzalaması, bordroda gösterilen kalemlerin o dönem için ödendiğine karine teşkil eder.'));
 
   c.push(maddeBaslik('MADDE 4) ÇALIŞMA SÜRELERİ, FAZLA ÇALIŞMA VE TELAFİ ÇALIŞMASI'));
   c.push(bent('a','Haftalık çalışma süresi en çok 45 saattir; bu süre günde 11 saati aşmamak kaydıyla haftanın çalışılan günlerine farklı şekillerde dağıtılabilir.'));
   c.push(bent('b','Denkleştirme esasının uygulandığı hâllerde, iki aylık dönem içindeki haftalık ortalama çalışma süresi 45 saati aşmadığı sürece, bazı haftalardaki fazla çalışma sayılmaz.'));
   c.push(bent('c','İşveren, 4857 sayılı Kanun\'un 41. maddesi uyarınca ve İşçinin işbu sözleşmeyi imzalamakla verdiği muvafakati dâhilinde, günlük toplam çalışma süresi 11 saati aşmamak kaydıyla yılda 270 saate kadar fazla çalışma yaptırabilir. İşbu onay, İş Kanununa İlişkin Fazla Çalışma ve Fazla Sürelerle Çalışma Yönetmeliği\'nin 9. maddesi uyarınca sözleşmenin imzalanmasıyla verilmiş sayılır; bu onay her takvim yılı başında yenilenir.'));
   c.push(bent('d','İş Kanunu\'nun 64. maddesi kapsamında telafi çalışması yaptırılabilir; bu çalışmalar fazla çalışma sayılmaz ve ayrıca ücretlendirilmez.'));
-  c.push(bent('e','Ara dinlenme süreleri ve vardiya planlaması İşveren tarafından, kanuni asgari sürelere uyularak belirlenir.'));
-  { const n = kismiSureFazlaCalismaNotu(p,'f'); if(n) c.push(n); }
+  { const n = kismiSureFazlaCalismaNotu(p,'e'); if(n) c.push(n); }
   calismaDuzeniEkMaddesi(c);
 
   denemeMaddesi(c, p, denemeBilgi);
@@ -2100,15 +2097,13 @@ function mutfakIsSozlesmesi(p){
   c.push(bent('a','Taraflardan biri sözleşmeyi feshetmek istediğinde, 4857 sayılı Kanun\'un 17. maddesindeki ihbar önellerine uygun olarak yazılı bildirimde bulunur.'));
   c.push(bent('b','İşveren tarafından yapılan fesihlerde, kanuni şartların varlığı hâlinde kıdem tazminatı 1475 sayılı Kanun\'un 14. maddesi, ihbar tazminatı ise 4857 sayılı Kanun\'un 17. maddesi hükümlerine göre ödenir.'));
   c.push(bent('c','İşyerinde otuz işçi çalıştırma eşiği sağlanıyor ve İşçinin en az altı aylık kıdemi bulunuyorsa, fesihlerde 18-21. maddelerdeki geçerli sebep ve usul şartları uygulanır; aksi hâlde genel hükümler (m.17, 24-25) uygulanır.'));
-  c.push(bent('d','İşyeri İç Yönetmeliği ve işbu sözleşme hükümlerine aykırı davranış, disiplin/fesih sürecini başlatır.'));
-  { const n = belirliSureFesihNotu(p,'e'); if(n) c.push(n); }
+  { const n = belirliSureFesihNotu(p,'d'); if(n) c.push(n); }
 
   ekHukumlerMaddesi(c, 11, 'mutfak');
   c.push(maddeBaslik('MADDE 12) SON HÜKÜMLER'));
   c.push(bent('a','Sözleşmede düzenlenmeyen hususlarda 4857 sayılı İş Kanunu, Türk Borçlar Kanunu ve ilgili mevzuat hükümleri uygulanır.'));
   c.push(bent('b',`İşbu sözleşmeden doğacak uyuşmazlıklarda ${FIRMA.yetkili} yetkilidir.`));
-  c.push(bent('c','İşyeri İç Yönetmeliği ve Sadakat, Gizlilik, Sır Saklama ve Rekabet Yasağı Sözleşmesi işbu sözleşmenin eki ve ayrılmaz parçasıdır.'));
-  c.push(bent('d','İşbu sözleşme 12 maddeden ibaret olup, 2 nüsha olarak düzenlenmiş, okunarak taraflarca imza altına alınmıştır.'));
+  c.push(bent('c','İşbu sözleşme 12 maddeden ibaret olup, 2 nüsha olarak düzenlenmiş, okunarak taraflarca imza altına alınmıştır.'));
 
   c.push(...bos(1)); c.push(imzaSatiri('İŞVEREN','İŞÇİ'));
   return c;
@@ -2139,7 +2134,7 @@ function servisIsSozlesmesi(p){
   c.push(bent('e','İşçi, kasa/tahsilat işlemlerinde görevlendirilmişse, gün sonu kasa mutabakatına uyar.'));
   c.push(bent('f','İşçi, iş sözleşmesi hangi nedenle sona ererse ersin, kendisine teslim edilmiş kıyafet, ekipman ve varsa diğer malzemeleri eksiksiz iade eder.'));
   c.push(bent('g','İşçi, mesai saatleri içinde işin gerekleri dışında telefon, tablet ve benzeri cihazlarla ilgilenmemeyi kabul eder.'));
-  c.push(bent('h','İşçi, ikametgâh adresi değişikliğini en geç bir hafta içinde bildirir; bildirilmeyen değişiklikte işyerindeki adres tebligat adresi sayılır.'));
+  c.push(bent('h','İşçi, ikametgâh adresi değişikliğini en geç bir hafta içinde bildirir.'));
   c.push(bent('ı','İşçi, işe giriş sırasında verdiği bilgilerin doğru olduğunu; aksinin haklı fesih sebebi teşkil edeceğini kabul eder.'));
   c.push(bent('i','İşçi, İşverenin belirlediği servis forması, yaka kartı ve görünüm kurallarına uyar.'));
   c.push(bent('j','İşçi, görevi nedeniyle öğrendiği fiyatlandırma, kampanya ve müşteri bilgilerini iş amacı dışında paylaşmaz; bu yükümlülük sözleşme sonrası da makul süre devam eder.'));
@@ -2148,8 +2143,8 @@ function servisIsSozlesmesi(p){
   c.push(bent('a','İşçi ücreti brüttür ve İşçi adına açılacak banka hesabına ödenir.'));
   c.push(bent('b','Ücrete yapılacak zam İşverenin takdirindedir.'));
   c.push(bent('c','İşyerinde toplanan bahşişlerin paylaşım usulü İşveren tarafından belirlenir; bahşiş ücretin bir parçası olmayıp süreklilik arz etmeyen bir gelirdir.'));
-  c.push(bent('d','İşçinin İşverene olan borçlarının ücret ve tazminat alacaklarından mahsubu, borcun doğumundan sonra İşçinin vereceği yazılı onayla ve kanunun mahsuba izin verdiği sınırlar içinde yapılır.'));
-  c.push(bent('e','İşçiye zimmetle teslim edilen ve zimmet tutanağında bedeli ayrıca belirtilmiş olan (kişisel koruyucu donanım niteliğinde bulunmayan) eşyanın iş sözleşmesi sona erdiğinde iade edilmemesi hâlinde, İşverenin bu eşyanın bedelini talep hakkı saklıdır; bu bedel ancak İşçinin işten ayrılış işlemleri sırasında ayrıca vereceği yazılı onay ile ücretinden veya varsa kıdem/ihbar tazminatından mahsup edilebilir.'));
+  c.push(bent('d','İşçinin İşverene olan borçları ile hatalı veya fazla yapılan ödemeler İşçi tarafından iade edilir (TBK m.77 vd.); bu bedeller, borcun doğumundan sonra İşçinin vereceği yazılı onayla veya kanunen izin verilen sınırlar içinde ücret ve tazminat alacaklarından mahsup edilebilir.'));
+  c.push(bent('e','Zimmet tutanağında bedeli belirtilmiş (kişisel koruyucu donanım niteliğinde olmayan) eşyanın sözleşme sona erdiğinde iade edilmemesi hâlinde, İşverenin bedeli talep hakkı saklıdır; bedel ancak İşçinin ayrılış işlemleri sırasında vereceği yazılı onayla ücret veya kıdem/ihbar tazminatından mahsup edilebilir.'));
   c.push(bent('f','Ücret ayda bir, ücret döneminin bitimini izleyen ayın onuncu gününe kadar İşçinin banka hesabına ödenir.'));
 
   c.push(maddeBaslik('MADDE 4) ÇALIŞMA SÜRELERİ, VARDİYA VE FAZLA ÇALIŞMA'));
@@ -2157,8 +2152,7 @@ function servisIsSozlesmesi(p){
   c.push(bent('b','Vardiya çizelgeleri İşveren tarafından belirlenir ve önceden bildirilir.'));
   c.push(bent('c','İşveren, İşçinin sözleşme imzasıyla verdiği muvafakat dâhilinde, yılda 270 saate kadar fazla çalışma yaptırabilir; onay her takvim yılı başında yenilenir.'));
   c.push(bent('d','Telafi çalışması fazla çalışma sayılmaz ve ayrıca ücretlendirilmez.'));
-  c.push(bent('e','Ara dinlenme ve vardiya planlaması kanuni asgari sürelere uyularak belirlenir.'));
-  { const n = kismiSureFazlaCalismaNotu(p,'f'); if(n) c.push(n); }
+  { const n = kismiSureFazlaCalismaNotu(p,'e'); if(n) c.push(n); }
   calismaDuzeniEkMaddesi(c);
 
   denemeMaddesi(c, p, denemeBilgi);
@@ -2177,21 +2171,18 @@ function servisIsSozlesmesi(p){
   c.push(bent('a','İşveren, işçilik haklarını zamanında ödemek, iş sağlığı-güvenliği tedbirlerini almakla yükümlüdür.'));
   c.push(bent('b','İşveren, kıdeme göre 14-20-26 gün yıllık ücretli izni kullandırır.'));
   c.push(bent('c','İzin ücreti, izne başlamadan önce peşin ödenir veya avans olarak verilir (m.57).'));
-  c.push(bent('d','İşveren, deneme süresi dâhil SGK bildirimlerini yasal süresinde yapar.'));
 
   c.push(maddeBaslik('MADDE 9) SÖZLEŞMENİN FESHİ VE TAZMİNATLAR'));
   c.push(bent('a','Fesih bildirimi, 4857 m.17 ihbar önellerine uygun ve yazılı yapılır.'));
   c.push(bent('b','İşveren feshinde, kanuni şartların varlığı hâlinde kıdem ve ihbar tazminatı ödenir.'));
   c.push(bent('c','Otuz işçi eşiği ve altı aylık kıdem şartı sağlanıyorsa m.18-21 geçerli sebep rejimi; aksi hâlde genel hükümler uygulanır.'));
-  c.push(bent('d','İşyeri İç Yönetmeliği\'ne aykırılık disiplin/fesih sürecini başlatır.'));
-  { const n = belirliSureFesihNotu(p,'e'); if(n) c.push(n); }
+  { const n = belirliSureFesihNotu(p,'d'); if(n) c.push(n); }
 
   ekHukumlerMaddesi(c, 10, 'servis');
   c.push(maddeBaslik('MADDE 11) SON HÜKÜMLER'));
   c.push(bent('a','Düzenlenmeyen hususlarda 4857 sayılı İş Kanunu ve ilgili mevzuat uygulanır.'));
   c.push(bent('b',`Uyuşmazlıklarda ${FIRMA.yetkili} yetkilidir.`));
-  c.push(bent('c','İşyeri İç Yönetmeliği işbu sözleşmenin ekidir.'));
-  c.push(bent('d','İşbu sözleşme 11 maddeden ibaret olup 2 nüsha düzenlenmiş, okunarak imzalanmıştır.'));
+  c.push(bent('c','İşbu sözleşme 11 maddeden ibaret olup 2 nüsha düzenlenmiş, okunarak imzalanmıştır.'));
 
   c.push(...bos(1)); c.push(imzaSatiri('İŞVEREN','İŞÇİ'));
   return c;
@@ -2226,9 +2217,9 @@ function idariIsSozlesmesi(p){
   c.push(maddeBaslik('MADDE 3) ÜCRET VE ÖDEME'));
   c.push(bent('a','İşçi ücreti brüttür ve banka hesabına ödenir.'));
   c.push(bent('b','Zam İşverenin takdirindedir.'));
-  c.push(bent('c','Süreklilik arz etmeyen ödemeler kazanılmış hak değildir.'));
-  c.push(bent('d','İşçinin İşverene olan borçlarının ücret ve tazminat alacaklarından mahsubu, borcun doğumundan sonra İşçinin vereceği yazılı onayla ve kanunun mahsuba izin verdiği sınırlar içinde yapılır.'));
-  c.push(bent('e','İşçiye zimmetle teslim edilen ve zimmet tutanağında bedeli ayrıca belirtilmiş olan (kişisel koruyucu donanım niteliğinde bulunmayan) eşyanın iş sözleşmesi sona erdiğinde iade edilmemesi hâlinde, İşverenin bu eşyanın bedelini talep hakkı saklıdır; bu bedel ancak İşçinin işten ayrılış işlemleri sırasında ayrıca vereceği yazılı onay ile ücretinden veya varsa kıdem/ihbar tazminatından mahsup edilebilir.'));
+  c.push(bent('c','Süreklilik arz etmeyen ve takdire bağlı ödemeler ile uygulamalar, yazılı olarak ayrıca kararlaştırılmadıkça kazanılmış hak değildir ve İşçi lehine sözleşmesel hak doğurmaz.'));
+  c.push(bent('d','İşçinin İşverene olan borçları ile hatalı veya fazla yapılan ödemeler İşçi tarafından iade edilir (TBK m.77 vd.); bu bedeller, borcun doğumundan sonra İşçinin vereceği yazılı onayla veya kanunen izin verilen sınırlar içinde ücret ve tazminat alacaklarından mahsup edilebilir.'));
+  c.push(bent('e','Zimmet tutanağında bedeli belirtilmiş (kişisel koruyucu donanım niteliğinde olmayan) eşyanın sözleşme sona erdiğinde iade edilmemesi hâlinde, İşverenin bedeli talep hakkı saklıdır; bedel ancak İşçinin ayrılış işlemleri sırasında vereceği yazılı onayla ücret veya kıdem/ihbar tazminatından mahsup edilebilir.'));
   c.push(bent('f','Ücret ayda bir, ücret döneminin bitimini izleyen ayın onuncu gününe kadar İşçinin banka hesabına ödenir.'));
 
   c.push(maddeBaslik('MADDE 4) ÇALIŞMA SÜRELERİ VE FAZLA ÇALIŞMA'));
@@ -2254,15 +2245,13 @@ function idariIsSozlesmesi(p){
   c.push(bent('a','Fesih bildirimi m.17 ihbar önellerine uygun ve yazılı yapılır.'));
   c.push(bent('b','İşveren feshinde kanuni şartlarla kıdem/ihbar tazminatı ödenir.'));
   c.push(bent('c','Otuz işçi eşiği ve altı aylık kıdem varsa m.18-21 uygulanır; aksi hâlde genel hükümler uygulanır.'));
-  c.push(bent('d','İç Yönetmeliğe aykırılık disiplin/fesih sürecini başlatır.'));
-  { const n = belirliSureFesihNotu(p,'e'); if(n) c.push(n); }
+  { const n = belirliSureFesihNotu(p,'d'); if(n) c.push(n); }
 
   ekHukumlerMaddesi(c, 9, 'idari');
   c.push(maddeBaslik('MADDE 10) SON HÜKÜMLER'));
   c.push(bent('a','Düzenlenmeyen hususlarda ilgili mevzuat uygulanır.'));
   c.push(bent('b',`Uyuşmazlıklarda ${FIRMA.yetkili} yetkilidir.`));
-  c.push(bent('c','İşyeri İç Yönetmeliği işbu sözleşmenin ekidir.'));
-  c.push(bent('d','İşbu sözleşme 10 maddeden ibaret olup 2 nüsha düzenlenmiş, okunarak imzalanmıştır.'));
+  c.push(bent('c','İşbu sözleşme 10 maddeden ibaret olup 2 nüsha düzenlenmiş, okunarak imzalanmıştır.'));
 
   c.push(...bos(1)); c.push(imzaSatiri('İŞVEREN','İŞÇİ'));
   return c;
@@ -2312,9 +2301,9 @@ function yonetimIsSozlesmesi(p){
   c.push(maddeBaslik('MADDE 3) ÜCRET VE ÖDEME'));
   c.push(bent('a','İşçi ücreti brüttür ve banka hesabına ödenir.'));
   c.push(bent('b','Zam İşverenin takdirindedir; performans ve işletme sonuçları esas alınır.'));
-  c.push(bent('c','Süreklilik arz etmeyen ödemeler kazanılmış hak değildir.'));
-  c.push(bent('d','İşçinin İşverene olan borçlarının ücret ve tazminat alacaklarından mahsubu, borcun doğumundan sonra İşçinin vereceği yazılı onayla ve kanunun mahsuba izin verdiği sınırlar içinde yapılır.'));
-  c.push(bent('e','İşçiye zimmetle teslim edilen ve zimmet tutanağında bedeli ayrıca belirtilmiş olan (kişisel koruyucu donanım niteliğinde bulunmayan) eşyanın iş sözleşmesi sona erdiğinde iade edilmemesi hâlinde, İşverenin bu eşyanın bedelini talep hakkı saklıdır; bu bedel ancak İşçinin işten ayrılış işlemleri sırasında ayrıca vereceği yazılı onay ile ücretinden veya varsa kıdem/ihbar tazminatından mahsup edilebilir.'));
+  c.push(bent('c','Süreklilik arz etmeyen ve takdire bağlı ödemeler ile uygulamalar, yazılı olarak ayrıca kararlaştırılmadıkça kazanılmış hak değildir ve İşçi lehine sözleşmesel hak doğurmaz.'));
+  c.push(bent('d','İşçinin İşverene olan borçları ile hatalı veya fazla yapılan ödemeler İşçi tarafından iade edilir (TBK m.77 vd.); bu bedeller, borcun doğumundan sonra İşçinin vereceği yazılı onayla veya kanunen izin verilen sınırlar içinde ücret ve tazminat alacaklarından mahsup edilebilir.'));
+  c.push(bent('e','Zimmet tutanağında bedeli belirtilmiş (kişisel koruyucu donanım niteliğinde olmayan) eşyanın sözleşme sona erdiğinde iade edilmemesi hâlinde, İşverenin bedeli talep hakkı saklıdır; bedel ancak İşçinin ayrılış işlemleri sırasında vereceği yazılı onayla ücret veya kıdem/ihbar tazminatından mahsup edilebilir.'));
   c.push(bent('f','Ücret ayda bir, ücret döneminin bitimini izleyen ayın onuncu gününe kadar İşçinin banka hesabına ödenir.'));
 
   c.push(maddeBaslik('MADDE 4) ÇALIŞMA SÜRELERİ VE FAZLA ÇALIŞMA'));
@@ -2346,15 +2335,13 @@ function yonetimIsSozlesmesi(p){
   c.push(bent('a','Fesih bildirimi m.17 ihbar önellerine uygun ve yazılı yapılır.'));
   c.push(bent('b','İşveren feshinde kanuni şartlarla kıdem/ihbar tazminatı ödenir.'));
   c.push(bent('c','Otuz işçi eşiği ve altı aylık kıdem varsa m.18-21 uygulanır.'));
-  c.push(bent('d','İç Yönetmeliğe aykırılık disiplin/fesih sürecini başlatır.'));
-  { const n = belirliSureFesihNotu(p,'e'); if(n) c.push(n); }
+  { const n = belirliSureFesihNotu(p,'d'); if(n) c.push(n); }
 
   ekHukumlerMaddesi(c, 10, 'yonetim');
   c.push(maddeBaslik('MADDE 11) SON HÜKÜMLER'));
   c.push(bent('a','Düzenlenmeyen hususlarda ilgili mevzuat uygulanır.'));
   c.push(bent('b',`Uyuşmazlıklarda ${FIRMA.yetkili} yetkilidir.`));
-  c.push(bent('c','İç Yönetmelik ve Gizlilik/Rekabet Sözleşmesi işbu sözleşmenin ekidir.'));
-  c.push(bent('d','İşbu sözleşme '+(argeBlok?'12 (Madde 6/A dâhil)':'11')+' maddeden ibaret olup 2 nüsha düzenlenmiş, okunarak imzalanmıştır.'));
+  c.push(bent('c','İşbu sözleşme '+(argeBlok?'12 (Madde 6/A dâhil)':'11')+' maddeden ibaret olup 2 nüsha düzenlenmiş, okunarak imzalanmıştır.'));
 
   c.push(...bos(1)); c.push(imzaSatiri('İŞVEREN','İŞÇİ'));
   return c;
@@ -2685,7 +2672,7 @@ function ozlukListesi(p){
   c.push(baslik('ÖZLÜK DOSYASI KONTROL LİSTESİ', {after:60}));
   c.push(baslik(adTitle(p.ad)+' — '+gorevLabel(p), {after:240, size:SZ}));
   c.push(maddeBaslik('İŞE GİRİŞ KAPSAMINDA BULUNMASI GEREKEN BELGELER'));
-  ['Nüfus cüzdanı/T.C. kimlik kartı fotokopisi','İkametgâh belgesi','İşe giriş sağlık raporu','Diploma fotokopisi (gerekli görülen pozisyonlarda)','2 adet vesikalık fotoğraf','Askerlik durum belgesi (erkek çalışanlar için)','İmzalı İş Sözleşmesi'+(p._gizlilikVar?' ve Gizlilik/Rekabet Sözleşmesi':''),'SGK işe giriş bildirgesi','İşe Başvuru ve İşyeri Kuralları Bilgilendirme Formu','Banka hesap bilgisi (IBAN)','İmzalı KVKK Aydınlatma Metni ve gerekli hâllerde Açık Rıza Beyanı','İmzalı İşyeri İç Yönetmeliği','İmzalı Fazla Çalışma Onay Formu'].forEach(t=>c.push(madde(t)));
+  ['Nüfus cüzdanı/T.C. kimlik kartı fotokopisi','İkametgâh belgesi','İşe giriş sağlık raporu','Diploma fotokopisi (gerekli görülen pozisyonlarda)','2 adet vesikalık fotoğraf','Askerlik durum belgesi (erkek çalışanlar için)','İmzalı İş Sözleşmesi'+(p._gizlilikVar?' ve Gizlilik/Rekabet Sözleşmesi':''),'SGK işe giriş bildirgesi','İşe Başvuru ve İşyeri Kuralları Bilgilendirme Formu','Banka hesap bilgisi (IBAN)','İmzalı KVKK Aydınlatma Metni ve gerekli hâllerde Açık Rıza Beyanı','İşyeri İç Yönetmeliği (işyerinde ilan edilmiştir; iş sözleşmesinde beyan edilir, ayrıca imza aranmaz)','İmzalı Fazla Çalışma Onay Formu'].forEach(t=>c.push(madde(t)));
   if(p.modulEfektif==='mutfak'||p.modulEfektif==='servis'){
     c.push(maddeBaslik('MUTFAK/SERVİS PERSONELİ İÇİN AYRICA GEREKEN BELGELER'));
     ['Gıda hijyeni eğitim sertifikası','Periyodik sağlık kontrolü/portör muayenesi sonuçları'].forEach(t=>c.push(madde(t)));
@@ -3792,7 +3779,6 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
 const BELGE_TANIMLARI = [
   {k:'sozlesme', l:'İş Sözleşmesi', zorunlu:true},
   {k:'gizlilik', l:'Sadakat, Gizlilik ve Rekabet Yasağı Sözleşmesi', kosullu:true},
-  {k:'kuralTebligBelge', l:'İşyeri İç Yönetmeliği ve Kural Bildirim Tutanağı', zorunlu:true},
   {k:'kvkkAydinlatma', l:'KVKK Aydınlatma Metni', zorunlu:false, varsayilan:true},
   {k:'kvkkRiza', l:'KVKK İzin Belgesi (Kamera)', zorunlu:false, varsayilan:true},
   {k:'zimmet', l:'Zimmet Teslim Tutanağı', zorunlu:false, varsayilan:true, zimmetKosullu:true},
@@ -3959,7 +3945,6 @@ async function iseAlimPaketi(p,secim,yenidenHazirla){
     const tur=p.modulEfektif==='mutfak'?'mutfak':(p.modulEfektif==='yonetim'?'yonetim':'genel');
     await ekle('Gizlilik_Rekabet_Sozlesmesi',gizlilikSozlesmesi(p,tur));
   }
-  if(sec('kuralTebligBelge'))await ekle('Ic_Yonetmelik_Kural_Bildirim_Tutanagi',kuralTeblig(p));
   if(sec('kvkkAydinlatma'))await ekle('KVKK_Aydinlatma_Metni',kvkkAydinlatma());
   if(sec('kvkkRiza'))await ekle('KVKK_Izin_Belgesi_Kamera',kvkkAcikRiza(p));
   if(sec('zimmet')&&p.zimmetler&&p.zimmetler.length)await ekle('Zimmet_Teslim_Tutanagi',zimmetTeslimTutanagi(p));
@@ -5896,7 +5881,7 @@ function v90OzlukDefs(p){
    ['kvkk','İmzalı KVKK aydınlatma metni / açık rıza',()=> b.some(x=>/KVKK/i.test(x))],
    ['ozluk','Özlük kontrol listesi',()=> b.some(x=>/Özlük/i.test(x))],
    ['isg','İSG eğitim kaydı (imzalı)',()=> ISLEMLER.some(x=>x.personelId===p.id&&x.tur==='isg')],
-   ['icyon','İmzalı işyeri iç yönetmeliği / kural bildirimi',()=> b.some(x=>/Yönetmelik|Kural/i.test(x))],
+   ['icyon','İşyeri iç yönetmeliği (ilan + sözleşmede beyan; ayrıca imza aranmaz)',()=> b.some(x=>/sözleş/i.test(x))],
    ['fcOnay','İmzalı fazla çalışma onay formu',()=> b.some(x=>/Fazla/i.test(x))],
    ['kimlik','Nüfus cüzdanı / kimlik kartı fotokopisi',()=>false],
    ['ikamet','İkametgâh belgesi',()=>false],
@@ -7609,7 +7594,7 @@ window.v134DisciplineRender=function(){
    (tarih/ihbar düzeltmeleri, sözleşme metinleri ve ölü kod temizliği doğrudan
    ilgili fonksiyonlarda yapıldı; bu blok yalnızca yeni akışları içerir)
    ===================================================================== */
-const APP_SURUM = 'v20.26 · 12.10.2026 · Masaüstü';
+const APP_SURUM = 'v20.27 · 12.10.2026 · Masaüstü';
 
 function v14IsGunuEkle(iso,n){
   const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||''); if(!m) return null;
@@ -8101,7 +8086,7 @@ detayEklentiEkle(96,function(pid){
 </script>
 <script id="v-baslatma-birlesik">
 /* ---- v20.1: sürüm, yedek uyarı çubuğu, toplu bakiye ---- */
-const PROGRAM_SURUM='20.26 (12.10.2026)'; window.PROGRAM_SURUM=PROGRAM_SURUM;
+const PROGRAM_SURUM='20.27 (12.10.2026)'; window.PROGRAM_SURUM=PROGRAM_SURUM;
 
 /* v20.1: personel dosyası İzin sekmesi — tüm izin kayıtları (yıllık + mazeret), durum ve işlem düğmeleri */
 function v20IzinListe(p){
