@@ -282,7 +282,6 @@ impl Disk {
     /// Veri klasörünü bu program örneğine özel kilitler. Aynı klasörü başka bir program
     /// penceresi (örn. eski Electron sürümü) kullanıyorsa kilit alınamaz.
     pub fn kilitle(kok: &Path) -> Result<fs::File, String> {
-        fs::create_dir_all(kok).map_err(|e| e.to_string())?;
         let f = fs::OpenOptions::new()
             .create(true)
             .write(true)
@@ -293,6 +292,28 @@ impl Disk {
             Err(fs::TryLockError::WouldBlock) => Err("kilitli".into()),
             Err(fs::TryLockError::Error(e)) => Err(e.to_string()),
         }
+    }
+
+    /// Klasörü oluşturur ve gerçekten yazılabildiğini bir deneme dosyasıyla doğrular.
+    pub fn hazirla(kok: &Path) -> Result<(), String> {
+        let mut son = String::new();
+        for _ in 0..3 {
+            if let Err(e) = fs::create_dir_all(kok) {
+                son = format!("klasör oluşturulamadı: {}", e);
+            } else {
+                let p = kok.join(".yazma-denemesi");
+                match fs::write(&p, b"ok").and_then(|_| fs::read(&p)) {
+                    Ok(v) if v == b"ok" => {
+                        let _ = fs::remove_file(&p);
+                        return Ok(());
+                    }
+                    Ok(_) => son = "deneme dosyası okunamadı".into(),
+                    Err(e) => son = format!("deneme dosyası yazılamadı: {}", e),
+                }
+            }
+            std::thread::sleep(std::time::Duration::from_millis(300));
+        }
+        Err(son)
     }
 
     /// Yedek alır: değişiklik varsa ve son yedekten 15 dk geçtiyse (ya da zorla).

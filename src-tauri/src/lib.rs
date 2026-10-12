@@ -25,7 +25,7 @@ struct Firma {
 }
 
 struct Durum {
-    _kilit: std::fs::File,
+    _kilit: Option<std::fs::File>,
     disk: Arc<Disk>,
     firma: Firma,
     son_belge: Mutex<Option<Instant>>,
@@ -332,21 +332,44 @@ pub fn run() {
     let firma_k = firma.clone();
     b.invoke_handler(tauri::generate_handler![disk_set, disk_remove, belge_kaydet, dis_ac])
         .setup(move |app| {
-            let kok = match std::env::var("HAUS_VERI_KLASORU") {
-                Ok(v) if !v.is_empty() => PathBuf::from(v),
-                _ => app.path().document_dir()?.join(&firma_k.klasor_adi),
-            };
-            let kilit = match Disk::kilitle(&kok) {
-                Ok(f) => f,
-                Err(e) => {
-                    let metin = if e == "kilitli" {
-                        format!(
-                            "Bu veri klasörü başka bir Haus Culture penceresi tarafından kullanılıyor.\n\nAçık duran başka bir pencere ya da eski sürüm olabilir; onu kapatıp programı yeniden açın.\n\nKlasör: {}",
-                            kok.display()
-                        )
-                    } else {
-                        format!("Veri klasörü hazırlanamadı: {}\n\nKlasör: {}", e, kok.display())
-                    };
+            let mut adaylar: Vec<PathBuf> = Vec::new();
+            match std::env::var("HAUS_VERI_KLASORU") {
+                Ok(v) if !v.is_empty() => adaylar.push(PathBuf::from(v)),
+                _ => {
+                    if let Ok(d) = app.path().document_dir() {
+                        adaylar.push(d.join(&firma_k.klasor_adi));
+                    }
+                    if let Ok(u) = std::env::var("USERPROFILE") {
+                        adaylar.push(PathBuf::from(u).join("Documents").join(&firma_k.klasor_adi));
+                    }
+                    if let Ok(u) = std::env::var("LOCALAPPDATA") {
+                        adaylar.push(PathBuf::from(u).join(&firma_k.klasor_adi));
+                    }
+                    if let Ok(d) = app.path().app_local_data_dir() {
+                        adaylar.push(d.join(&firma_k.klasor_adi));
+                    }
+                }
+            }
+            let mut hatalar: Vec<String> = Vec::new();
+            let mut yedek_not = String::new();
+            let mut secilen: Option<PathBuf> = None;
+            for (i, k) in adaylar.iter().enumerate() {
+                // Önceki sürümlerden kalmış veri varsa o klasör tercih edilir.
+                match Disk::hazirla(k) {
+                    Ok(()) => {
+                        secilen = Some(k.clone());
+                        if i > 0 {
+                            yedek_not = format!("Belgeler klasörüne yazılamadığı için veriler şu klasörde tutuluyor:\n{}\n\n(Ayrıntı: {})", k.display(), hatalar.join("; "));
+                        }
+                        break;
+                    }
+                    Err(e) => hatalar.push(format!("{} → {}", k.display(), e)),
+                }
+            }
+            let kok = match secilen {
+                Some(k) => k,
+                None => {
+                    let metin = format!("Veri klasörü hazırlanamadı:\n\n{}", hatalar.join("\n"));
                     let h = app.handle().clone();
                     std::thread::spawn(move || {
                         mesaj(&h, "Program açılamadı", &metin, MessageDialogKind::Error);
@@ -354,6 +377,22 @@ pub fn run() {
                     });
                     return Ok(());
                 }
+            };
+            let kilit = match Disk::kilitle(&kok) {
+                Ok(f) => Some(f),
+                Err(e) if e == "kilitli" => {
+                    let metin = format!(
+                        "Bu veri klasörü başka bir Haus Culture penceresi tarafından kullanılıyor.\n\nAçık duran başka bir pencere ya da eski sürüm olabilir; onu kapatıp programı yeniden açın.\n\nKlasör: {}",
+                        kok.display()
+                    );
+                    let h = app.handle().clone();
+                    std::thread::spawn(move || {
+                        mesaj(&h, "Program açılamadı", &metin, MessageDialogKind::Error);
+                        h.exit(1);
+                    });
+                    return Ok(());
+                }
+                Err(_) => None, // kilit alınamıyorsa (örn. bulut klasörü) çalışmaya devam edilir
             };
             let disk = Arc::new(Disk::ac(kok, &firma_k.surum));
             let script = boot_betigi(&disk, &firma_k);
@@ -408,6 +447,11 @@ pub fn run() {
 
             menu_kur(app.handle())?;
 
+            if !yedek_not.is_empty() {
+                let h = app.handle().clone();
+                let n = yedek_not.clone();
+                std::thread::spawn(move || mesaj(&h, "Veri klasörü", &n, MessageDialogKind::Warning));
+            }
             if !acilis_notu.is_empty() {
                 let h = app.handle().clone();
                 std::thread::spawn(move || {
