@@ -2500,7 +2500,8 @@ function isBasvuruBelgesi(opts){
   }
   if(opts.evraklar){
     c.push(altBaslik('İŞE KABUL HALİNDE TAMAMLANACAK BELGELER'));
-    ['Kimlik fotokopisi','Yerleşim yeri / adres bilgisi','Diploma veya öğrenim belgesi (görev için gerekli ise)','Banka / IBAN bilgisi','İşe giriş için talep edilen sağlık ve İSG belgeleri','Pozisyon için gerekli mesleki belge, sertifika veya hijyen belgesi (varsa)'].forEach(x=>c.push(kutu(x)));
+    ['Kimlik fotokopisi','Yerleşim yeri / adres bilgisi','Diploma veya öğrenim belgesi (görev için gerekli ise)','Banka / IBAN bilgisi','İşe giriş için talep edilen sağlık ve İSG belgeleri','İSG eğitimi belgesi ile 4’lü portör ve 4’lü tetkik sonuçları','Pozisyon için gerekli mesleki belge, sertifika veya hijyen belgesi (varsa)'].forEach(x=>c.push(kutu(x)));
+    c.push(govde('(İSG eğitimi, Üçevler Mah. 72. Sok. Aknil Plaza Kat:1 No:6/16 Nilüfer/Bursa adresinde faaliyet gösteren İSG uzmanı Ecoglobal İSG firmasına gidilerek alınacak ve eğitim belgesi işverene teslim edilecektir. 4’lü portör ve 4’lü tetkik de aynı firmada yaptırılacaktır. Bu işlemlerin söz konusu firmada yaptırılması hâlinde şirketin sağladığı indirimden yararlanılır; indirimli bedel personel tarafından ödenir.)',{girinti:false}));
     c.push(govde('İşin ve pozisyonun niteliğine göre ilave belge talep edilebilir.',{girinti:false}));
   }
   c.push(altBaslik('ADAY BEYANI'));

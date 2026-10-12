@@ -81,11 +81,27 @@ const BOOT_JS: &str = r#"
       r.readAsDataURL(blob);
     });
   }
+  // Tarayıcıdaki indirme bildirimi gibi: sağ üstte açılır, tıklanınca klasör açılır.
+  function bildir(msg, yedek){
+    try{
+      var eski = document.getElementById('hcIndBildirim'); if(eski) eski.remove();
+      var d = document.createElement('div');
+      d.id = 'hcIndBildirim'; d.setAttribute('role', 'status');
+      d.style.cssText = 'position:fixed;top:68px;right:18px;z-index:99999;max-width:340px;background:#fff;color:#17212b;border:1px solid #cfd6dd;border-left:4px solid #e8710a;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.28);padding:12px 14px;font:13.5px/1.4 -apple-system,Segoe UI,sans-serif;cursor:pointer';
+      var t = document.createElement('div'); t.style.cssText = 'font-weight:700;margin-bottom:2px'; t.textContent = yedek ? 'Yedek kaydedildi' : 'Belge indirildi';
+      var m = document.createElement('div'); m.style.cssText = 'word-break:break-word'; m.textContent = String(msg).replace(/^[^:]*:\s*/, '');
+      var l = document.createElement('div'); l.style.cssText = 'margin-top:6px;color:#b45309;font-weight:600'; l.textContent = 'Klasörü göstermek için tıklayın';
+      d.appendChild(t); d.appendChild(m); d.appendChild(l);
+      d.onclick = function(){ inv(yedek ? 'yedek_klasoru_ac' : 'indirilenler_ac', {}).catch(rep); d.remove(); };
+      document.body.appendChild(d);
+      setTimeout(function(){ if(d.parentNode) d.remove(); }, 12000);
+    }catch(_){ try{ if(typeof toast === 'function') toast(msg); }catch(__){} }
+  }
   function kaydet(blob, ad){
     if(!(blob instanceof Blob)) blob = new Blob([blob]);
     return b64(blob)
       .then(function(d){ return inv('belge_kaydet', { name: String(ad || 'belge'), dataB64: d }); })
-      .then(function(msg){ try{ if(typeof toast === 'function') toast(msg); }catch(_){} })
+      .then(function(msg){ bildir(msg, /^Yedek/.test(String(msg))); })
       .catch(function(e){ try{ alert('Belge kaydedilemedi: ' + String((e && e.message) || e)); }catch(_){} });
   }
   var hook = function(blob, ad){ kaydet(blob, ad); };
@@ -144,6 +160,11 @@ fn indirilenler_ac(app: AppHandle, st: tauri::State<'_, Durum>) {
         Some(k) if k.exists() => klasor_ac(&k),
         _ => klasor_ac(&st.disk.belge_dir),
     }
+}
+
+#[tauri::command]
+fn yedek_klasoru_ac(st: tauri::State<'_, Durum>) {
+    klasor_ac(&st.disk.yedek_dir.join("Elle alinan"));
 }
 
 fn klasor_ac(p: &Path) {
@@ -385,7 +406,7 @@ pub fn run() {
     b = b.plugin(tauri_plugin_dialog::init());
 
     let firma_k = firma.clone();
-    b.invoke_handler(tauri::generate_handler![disk_set, disk_remove, belge_kaydet, dis_ac, indirilenler_ac])
+    b.invoke_handler(tauri::generate_handler![disk_set, disk_remove, belge_kaydet, dis_ac, indirilenler_ac, yedek_klasoru_ac])
         .setup(move |app| {
             let mut adaylar: Vec<PathBuf> = Vec::new();
             match std::env::var("HAUS_VERI_KLASORU") {
