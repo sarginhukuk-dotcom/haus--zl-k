@@ -399,10 +399,13 @@ impl Disk {
         }
     }
 
-    pub fn belge_kaydet(&self, ad: &str, veri: &[u8]) -> Result<PathBuf, String> {
+    pub fn belge_kaydet(&self, ad: &str, veri: &[u8], indirilenler: Option<&Path>) -> Result<PathBuf, String> {
         let ad = guvenli_ad(ad);
         let klasor = if yedek_dosyasi_mi(&ad) {
             self.yedek_dir.join("Elle alinan")
+        } else if let Some(k) = indirilenler {
+            // İmzasız belgeler uygulama klasöründe saklanmaz; İndirilenler klasörüne bırakılır.
+            k.to_path_buf()
         } else {
             self.belge_dir.join(&damga()[..10])
         };
@@ -556,8 +559,8 @@ mod testler {
     fn belge_ayni_ad_uzerine_yazmaz() {
         let t = tempfile::tempdir().unwrap();
         let d = yeni(t.path());
-        let a = d.belge_kaydet("Deneme_Belge.docx", b"1").unwrap();
-        let b = d.belge_kaydet("Deneme_Belge.docx", b"2").unwrap();
+        let a = d.belge_kaydet("Deneme_Belge.docx", b"1", None).unwrap();
+        let b = d.belge_kaydet("Deneme_Belge.docx", b"2", None).unwrap();
         assert_ne!(a, b);
         assert_eq!(fs::read(&a).unwrap(), b"1");
         assert_eq!(fs::read(&b).unwrap(), b"2");
@@ -568,9 +571,9 @@ mod testler {
     fn yedek_json_elle_alinana_gider() {
         let t = tempfile::tempdir().unwrap();
         let d = yeni(t.path());
-        let y = d.belge_kaydet("Haus_yedek_2026.json", b"{}").unwrap();
+        let y = d.belge_kaydet("Haus_yedek_2026.json", b"{}", None).unwrap();
         assert!(y.to_string_lossy().contains("Elle alinan"));
-        let b = d.belge_kaydet("Dilekce.docx", b"x").unwrap();
+        let b = d.belge_kaydet("Dilekce.docx", b"x", None).unwrap();
         assert!(b.to_string_lossy().contains("Belgeler"));
     }
 

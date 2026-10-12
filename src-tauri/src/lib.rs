@@ -28,6 +28,7 @@ struct Durum {
     _kilit: Option<std::fs::File>,
     disk: Arc<Disk>,
     firma: Firma,
+    #[allow(dead_code)]
     son_belge: Mutex<Option<Instant>>,
 }
 
@@ -92,6 +93,22 @@ const BOOT_JS: &str = r#"
     Object.defineProperty(window, 'saveAs', { configurable: true, get: function(){ return hook; }, set: function(){} });
   } catch(_){ window.saveAs = hook; }
 
+  // Üst çubukta (tarayıcıdaki gibi) İndirilenler klasörüne götüren simge.
+  function indSimge(){
+    var h = document.querySelector('header.app');
+    if(!h || document.getElementById('hcIndBtn')) return;
+    var b = document.createElement('button');
+    b.id = 'hcIndBtn'; b.type = 'button'; b.title = 'İndirilen belgeleri göster';
+    b.setAttribute('aria-label', 'İndirilenler klasörünü aç');
+    b.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>';
+    b.style.cssText = 'margin-left:auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:8px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none';
+    b.onmouseenter = function(){ b.style.background = 'rgba(255,255,255,.2)'; };
+    b.onmouseleave = function(){ b.style.background = 'rgba(255,255,255,.1)'; };
+    b.onclick = function(){ inv('indirilenler_ac', {}).catch(rep); };
+    h.appendChild(b);
+  }
+  if(document.readyState === 'loading') window.addEventListener('DOMContentLoaded', indSimge); else indSimge();
+
   // Dış bağlantılar (WhatsApp vb.) varsayılan tarayıcıda açılır.
   window.open = function(u){
     if(u && /^https?:/i.test(String(u))) inv('dis_ac', { url: String(u) }).catch(rep);
@@ -114,6 +131,21 @@ fn boot_betigi(disk: &Disk, firma: &Firma) -> String {
 
 // ---------- Sistem işlemleri ----------
 
+fn indirilenler_klasoru(app: &AppHandle) -> Option<PathBuf> {
+    if let Ok(d) = app.path().download_dir() {
+        return Some(d);
+    }
+    std::env::var("USERPROFILE").ok().map(|u| PathBuf::from(u).join("Downloads"))
+}
+
+#[tauri::command]
+fn indirilenler_ac(app: AppHandle, st: tauri::State<'_, Durum>) {
+    match indirilenler_klasoru(&app) {
+        Some(k) if k.exists() => klasor_ac(&k),
+        _ => klasor_ac(&st.disk.belge_dir),
+    }
+}
+
 fn klasor_ac(p: &Path) {
     #[cfg(windows)]
     {
@@ -125,6 +157,7 @@ fn klasor_ac(p: &Path) {
     }
 }
 
+#[allow(dead_code)]
 fn dosyada_goster(p: &Path) {
     #[cfg(windows)]
     {
@@ -196,12 +229,12 @@ fn disk_remove(key: String, st: tauri::State<'_, Durum>) {
 }
 
 #[tauri::command]
-fn belge_kaydet(name: String, data_b64: String, st: tauri::State<'_, Durum>) -> Result<String, String> {
+fn belge_kaydet(name: String, data_b64: String, app: AppHandle, st: tauri::State<'_, Durum>) -> Result<String, String> {
     use base64::Engine;
     let bayt = base64::engine::general_purpose::STANDARD
         .decode(data_b64.as_bytes())
         .map_err(|e| e.to_string())?;
-    let yol = match st.disk.belge_kaydet(&name, &bayt) {
+    let yol = match st.disk.belge_kaydet(&name, &bayt, indirilenler_klasoru(&app).as_deref()) {
         Ok(y) => y,
         Err(e) => {
             st.disk.gunluge_yaz(&format!("belge_kaydet HATA {}: {}", name, e));
@@ -209,16 +242,12 @@ fn belge_kaydet(name: String, data_b64: String, st: tauri::State<'_, Durum>) -> 
         }
     };
     st.disk.gunluge_yaz(&format!("belge_kaydet tamam {} ({} bayt)", yol.display(), bayt.len()));
-    let ilk = {
-        let mut g = st.son_belge.lock().unwrap();
-        let ilk = g.map_or(true, |t| t.elapsed() > Duration::from_secs(3));
-        *g = Some(Instant::now());
-        ilk
-    };
-    if ilk {
-        dosyada_goster(&yol);
+    let yedek = yol.to_string_lossy().contains("Elle alinan");
+    if yedek {
+        Ok(format!("Yedek kaydedildi: {}", yol.display()))
+    } else {
+        Ok(format!("İndirilenler klasörüne kaydedildi: {}", yol.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default()))
     }
-    Ok(format!("Kaydedildi: {}", yol.display()))
 }
 
 #[tauri::command]
@@ -239,7 +268,7 @@ fn menu_kur(app: &AppHandle) -> tauri::Result<()> {
         true,
         &[
             &MenuItem::with_id(app, "veri_ac", "Veri klasörünü aç", true, None::<&str>)?,
-            &MenuItem::with_id(app, "belge_ac", "Belgeler klasörünü aç", true, None::<&str>)?,
+            &MenuItem::with_id(app, "belge_ac", "İndirilenler klasörünü aç", true, None::<&str>)?,
             &MenuItem::with_id(app, "yedek_ac", "Yedekler klasörünü aç", true, None::<&str>)?,
             &PredefinedMenuItem::separator(app)?,
             &MenuItem::with_id(app, "geri_yukle", "Yedekten geri yükle…", true, None::<&str>)?,
@@ -261,7 +290,7 @@ fn menu_kur(app: &AppHandle) -> tauri::Result<()> {
         let st = app.state::<Durum>();
         match id.as_str() {
             "veri_ac" => klasor_ac(&st.disk.kok),
-            "belge_ac" => klasor_ac(&st.disk.belge_dir),
+            "belge_ac" => indirilenler_ac(app.clone(), st.clone()),
             "yedek_ac" => klasor_ac(&st.disk.yedek_dir),
             "cikis" => app.exit(0),
             "yedek_simdi" => {
@@ -356,7 +385,7 @@ pub fn run() {
     b = b.plugin(tauri_plugin_dialog::init());
 
     let firma_k = firma.clone();
-    b.invoke_handler(tauri::generate_handler![disk_set, disk_remove, belge_kaydet, dis_ac])
+    b.invoke_handler(tauri::generate_handler![disk_set, disk_remove, belge_kaydet, dis_ac, indirilenler_ac])
         .setup(move |app| {
             let mut adaylar: Vec<PathBuf> = Vec::new();
             match std::env::var("HAUS_VERI_KLASORU") {
