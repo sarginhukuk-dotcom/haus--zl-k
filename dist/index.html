@@ -4542,7 +4542,7 @@ async function yedekIndir(){
   }else{
     saveAs(new Blob([veri],{type:'application/json'}),'HausCulture_Ozluk_Yedek_'+isoBugun()+'.json');
   }
-  toast('Yedek indirme isteği gönderildi. Dosya Belgeler\\Haus Culture\\Yedekler\\Elle alinan klasörüne kaydedilir.');
+  if(!window.__HC_DESKTOP) toast('Yedek indirme isteği gönderildi. Dosya Belgeler\\Haus Culture\\Yedekler\\Elle alinan klasörüne kaydedilir.');
   localStorage.setItem('hc_son_yedek',new Date().toISOString());sonYedekGoster();try{v20YedekBarGuncelle();v209Foot()}catch(_e){}
   return true;
 }
@@ -7573,7 +7573,7 @@ window.v134DisciplineRender=function(){
    (tarih/ihbar düzeltmeleri, sözleşme metinleri ve ölü kod temizliği doğrudan
    ilgili fonksiyonlarda yapıldı; bu blok yalnızca yeni akışları içerir)
    ===================================================================== */
-const APP_SURUM = 'v20.32 · 12.10.2026 · Masaüstü';
+const APP_SURUM = 'v20.33 · 12.10.2026 · Masaüstü';
 
 function v14IsGunuEkle(iso,n){
   const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||''); if(!m) return null;
@@ -8065,7 +8065,7 @@ detayEklentiEkle(96,function(pid){
 </script>
 <script id="v-baslatma-birlesik">
 /* ---- v20.1: sürüm, yedek uyarı çubuğu, toplu bakiye ---- */
-const PROGRAM_SURUM='20.32 (12.10.2026)'; window.PROGRAM_SURUM=PROGRAM_SURUM;
+const PROGRAM_SURUM='20.33 (12.10.2026)'; window.PROGRAM_SURUM=PROGRAM_SURUM;
 
 /* v20.1: personel dosyası İzin sekmesi — tüm izin kayıtları (yıllık + mazeret), durum ve işlem düğmeleri */
 function v20IzinListe(p){

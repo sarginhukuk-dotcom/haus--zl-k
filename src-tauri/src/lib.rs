@@ -209,13 +209,7 @@ fn belge_kaydet(name: String, data_b64: String, st: tauri::State<'_, Durum>) -> 
     if ilk {
         dosyada_goster(&yol);
     }
-    let ust = yol.parent().and_then(|p| p.file_name()).map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
-    let rel = if ust == "Elle alinan" {
-        "Yedekler\\Elle alinan".to_string()
-    } else {
-        format!("Belgeler\\{}", ust)
-    };
-    Ok(format!("Belge kaydedildi: Belgeler\\{}\\{}", st.firma.klasor_adi, rel))
+    Ok(format!("Kaydedildi: {}", yol.display()))
 }
 
 #[tauri::command]
