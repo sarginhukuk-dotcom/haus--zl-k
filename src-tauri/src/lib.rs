@@ -25,6 +25,7 @@ struct Firma {
 }
 
 struct Durum {
+    _kilit: std::fs::File,
     disk: Arc<Disk>,
     firma: Firma,
     son_belge: Mutex<Option<Instant>>,
@@ -335,11 +336,31 @@ pub fn run() {
                 Ok(v) if !v.is_empty() => PathBuf::from(v),
                 _ => app.path().document_dir()?.join(&firma_k.klasor_adi),
             };
+            let kilit = match Disk::kilitle(&kok) {
+                Ok(f) => f,
+                Err(e) => {
+                    let metin = if e == "kilitli" {
+                        format!(
+                            "Bu veri klasörü başka bir Haus Culture penceresi tarafından kullanılıyor.\n\nAçık duran başka bir pencere ya da eski sürüm olabilir; onu kapatıp programı yeniden açın.\n\nKlasör: {}",
+                            kok.display()
+                        )
+                    } else {
+                        format!("Veri klasörü hazırlanamadı: {}\n\nKlasör: {}", e, kok.display())
+                    };
+                    let h = app.handle().clone();
+                    std::thread::spawn(move || {
+                        mesaj(&h, "Program açılamadı", &metin, MessageDialogKind::Error);
+                        h.exit(1);
+                    });
+                    return Ok(());
+                }
+            };
             let disk = Arc::new(Disk::ac(kok, &firma_k.surum));
             let script = boot_betigi(&disk, &firma_k);
             let acilis_notu = disk.acilis_notu.clone();
             let kok_goster = disk.kok.display().to_string();
             app.manage(Durum {
+                _kilit: kilit,
                 disk: disk.clone(),
                 firma: firma_k.clone(),
                 son_belge: Mutex::new(None),

@@ -29,7 +29,6 @@ pub struct Disk {
     pub kok: PathBuf,
     pub veri_yolu: PathBuf,
     pub onceki_yolu: PathBuf,
-    pub tmp_yolu: PathBuf,
     pub yedek_dir: PathBuf,
     pub belge_dir: PathBuf,
     pub acilis_notu: String,
@@ -96,7 +95,6 @@ impl Disk {
         let d0 = Disk {
             veri_yolu: kok.join("veri.json"),
             onceki_yolu: kok.join("veri.onceki.json"),
-            tmp_yolu: kok.join("veri.yazilan.tmp"),
             yedek_dir: kok.join("Yedekler"),
             belge_dir: kok.join("Belgeler"),
             kok,
@@ -212,8 +210,22 @@ impl Disk {
         }
     }
 
+    /// Her yazım denemesi kendi geçici dosya adını kullanır (işlem no + sayaç); başka bir
+    /// program ya da önceki bir deneme aynı adı kullanıp dosyayı aradan alamaz.
+    fn gecici_yol(&self) -> PathBuf {
+        use std::sync::atomic::{AtomicU64, Ordering};
+        static SAYAC: AtomicU64 = AtomicU64::new(0);
+        let n = SAYAC.fetch_add(1, Ordering::Relaxed);
+        self.kok.join(format!("veri.yazilan.{}.{}.tmp", std::process::id(), n))
+    }
+
+    /// Atomik yazma. Geçici dosya → fsync → doğrulama → önceki kopya → yeniden adlandırma.
+    /// Yeniden adlandırma geçici olarak başarısız olursa (virüs tarayıcı, OneDrive, başka program)
+    /// birkaç kez yeniden denenir; hâlâ olmazsa son çare olarak doğrudan yazılır
+    /// (önceki sağlam kopya bu noktada zaten ayrıca saklanmıştır).
     fn yaz_ic(&self, veri: &Veri) -> Result<(), String> {
-        self.klasorleri_hazirla().map_err(|e| e.to_string())?;
+        self.klasorleri_hazirla()
+            .map_err(|e| format!("klasör oluşturulamadı [{}]: {}", self.kok.display(), e))?;
         let metin = serde_json::to_string(&json!({
             "surum": 1,
             "program": self.surum,
@@ -221,18 +233,66 @@ impl Disk {
             "veri": veri,
         }))
         .map_err(|e| e.to_string())?;
-        {
-            let mut f = fs::File::create(&self.tmp_yolu).map_err(|e| e.to_string())?;
+
+        let mut son_hata = String::new();
+        let mut onceki_alindi = false;
+        for deneme in 0..4 {
+            if deneme > 0 {
+                std::thread::sleep(Duration::from_millis(120 * deneme));
+            }
+            let tmp = self.gecici_yol();
+            let adim = (|| -> Result<(), String> {
+                {
+                    let mut f = fs::File::create(&tmp).map_err(|e| format!("geçici dosya oluşturulamadı: {}", e))?;
+                    f.write_all(metin.as_bytes()).map_err(|e| format!("geçici dosyaya yazılamadı: {}", e))?;
+                    f.sync_all().map_err(|e| format!("geçici dosya diske işlenemedi: {}", e))?;
+                }
+                if dosyadan_oku(&tmp).is_none() {
+                    return Err("yazılan dosya doğrulanamadı".into());
+                }
+                if !onceki_alindi {
+                    if self.veri_yolu.exists() && dosyadan_oku(&self.veri_yolu).is_some() {
+                        let _ = fs::copy(&self.veri_yolu, &self.onceki_yolu);
+                    }
+                    onceki_alindi = true;
+                }
+                fs::rename(&tmp, &self.veri_yolu).map_err(|e| format!("veri.json değiştirilemedi: {}", e))
+            })();
+            match adim {
+                Ok(()) => return Ok(()),
+                Err(e) => {
+                    let _ = fs::remove_file(&tmp);
+                    son_hata = e;
+                }
+            }
+        }
+        // Son çare: doğrudan yaz (önceki kopya yukarıda alındı).
+        let dogrudan = (|| -> Result<(), String> {
+            let mut f = fs::File::create(&self.veri_yolu).map_err(|e| e.to_string())?;
             f.write_all(metin.as_bytes()).map_err(|e| e.to_string())?;
-            f.sync_all().map_err(|e| e.to_string())?;
+            f.sync_all().map_err(|e| e.to_string())
+        })();
+        match dogrudan {
+            Ok(()) if dosyadan_oku(&self.veri_yolu).is_some() => Ok(()),
+            Ok(()) => Err(format!("{} (doğrudan yazım doğrulanamadı)", son_hata)),
+            Err(e) => Err(format!("{}; doğrudan yazım da başarısız: {} — klasör: {}", son_hata, e, self.kok.display())),
         }
-        if dosyadan_oku(&self.tmp_yolu).is_none() {
-            return Err("Yazılan dosya doğrulanamadı".into());
+    }
+
+    /// Veri klasörünü bu program örneğine özel kilitler. Aynı klasörü başka bir program
+    /// penceresi (örn. eski Electron sürümü) kullanıyorsa kilit alınamaz.
+    pub fn kilitle(kok: &Path) -> Result<fs::File, String> {
+        fs::create_dir_all(kok).map_err(|e| e.to_string())?;
+        let f = fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .open(kok.join("veri.kilit"))
+            .map_err(|e| e.to_string())?;
+        match f.try_lock() {
+            Ok(()) => Ok(f),
+            Err(fs::TryLockError::WouldBlock) => Err("kilitli".into()),
+            Err(fs::TryLockError::Error(e)) => Err(e.to_string()),
         }
-        if self.veri_yolu.exists() && dosyadan_oku(&self.veri_yolu).is_some() {
-            let _ = fs::copy(&self.veri_yolu, &self.onceki_yolu);
-        }
-        fs::rename(&self.tmp_yolu, &self.veri_yolu).map_err(|e| e.to_string())
     }
 
     /// Yedek alır: değişiklik varsa ve son yedekten 15 dk geçtiyse (ya da zorla).
@@ -363,6 +423,28 @@ mod testler {
         assert_eq!(d2.veri_json()["hc_personel"], "[1,2]");
         assert_eq!(d2.veri_json()["hc_x"], "ç ğ ş");
         assert!(d2.acilis_notu.is_empty());
+    }
+
+    #[test]
+    fn kilit_ikinci_kez_alinamaz() {
+        let t = tempfile::tempdir().unwrap();
+        let k1 = Disk::kilitle(t.path()).unwrap();
+        assert_eq!(Disk::kilitle(t.path()).err().as_deref(), Some("kilitli"));
+        drop(k1);
+        assert!(Disk::kilitle(t.path()).is_ok());
+    }
+
+    #[test]
+    fn gecici_dosya_kalmaz_ve_cok_yazim() {
+        let t = tempfile::tempdir().unwrap();
+        let d = yeni(t.path());
+        for i in 0..30 {
+            d.set("k".into(), format!("{}", i));
+            yaz_bekle(&d);
+        }
+        let tmp = fs::read_dir(t.path()).unwrap().filter_map(|e| e.ok()).any(|e| e.file_name().to_string_lossy().ends_with(".tmp"));
+        assert!(!tmp);
+        assert_eq!(yeni(t.path()).veri_json()["k"], "29");
     }
 
     #[test]
