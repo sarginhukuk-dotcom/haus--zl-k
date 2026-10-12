@@ -2005,7 +2005,7 @@ function ekHukumlerMaddesi(c, no, tur){
   b('Çalışma ve ücret kayıtları: Aylık puantaj, ücret ve fazla çalışma kayıtları İşçiye sunulur; İşçi bunları kontrol ederek imzalar. Kayıtlara ilişkin itirazın, kayıtların sunulduğu tarihten itibaren makul sürede yazılı olarak bildirilmesi esastır; yazılı itiraz yapılmayan kayıtlar aksi ispat edilene kadar İşçinin fiilî çalışmasını doğru yansıtır. İşçi, bordroyu ihtirazi kayıt koymaksızın imzalamakla, bordroda gösterilen kalemlerin ilgili dönem için ödendiğini beyan etmiş olur.');
 
   sec('D) İspat ve Kayıtlar');
-  b('Delil sözleşmesi: Taraflar, 6100 sayılı HMK m.193 uyarınca; puantaj ve vardiya çizelgeleri, PDKS, kasa/POS ve stok kayıtları, bordro ve banka dekontları, imzalı tutanak ve formlar, tebliğ belgeleri, işyeri e-posta ve mesajlaşmaları ile aydınlatma yapılmış güvenlik kamerası kayıtlarının uyuşmazlıkta delil olarak kullanılabileceğini kabul eder; bu kabul kamu düzenine ilişkin hükümleri ve aksinin kanuna uygun delillerle ispatı hakkını ortadan kaldırmaz. İşveren, bu belge ve kayıtları sözleşmenin sona ermesinden sonra da yasal saklama ve zamanaşımı süreleri boyunca saklayabilir.');
+  b('Delil sözleşmesi: Taraflar, 6100 sayılı HMK m.193 uyarınca; puantaj ve vardiya çizelgeleri, PDKS, kasa/POS ve stok kayıtları, bordro ve banka dekontları, imzalı tutanak ve formlar (izin formları dâhil), tebliğ belgeleri, işyeri e-posta ve mesajlaşmaları ile aydınlatma yapılmış güvenlik kamerası kayıtlarının uyuşmazlıkta delil olarak kullanılabileceğini kabul eder; bu kabul kamu düzenine ilişkin hükümleri ve aksinin kanuna uygun delillerle ispatı hakkını ortadan kaldırmaz. İşveren, bu belge ve kayıtları sözleşmenin sona ermesinden sonra da yasal saklama ve zamanaşımı süreleri boyunca saklayabilir.');
   b('Güvenlik kayıtları: İşçi, işyerinde güvenlik kamerası ve giriş-çıkış kayıt sistemi bulunduğunu kabul eder (aydınlatma için bkz. F(c)); kayıtlar işyeri güvenliği, somut olayların incelenmesi ve hakların korunması amacıyla ölçülülük ilkesine uygun olarak disiplin süreçlerinde ve yargı mercileri önünde kullanılabilir; tuvalet, soyunma ve dinlenme alanlarında kayıt yapılmaz.');
 
   sec('E) Fesih ve Sona Erme');
@@ -2068,8 +2068,9 @@ function mutfakIsSozlesmesi(p){
 
   c.push(maddeBaslik('MADDE 7) DİĞER YÜKÜMLÜLÜKLER VE YASAKLAR'));
   c.push(bent('a','İşçinin işyerine alkol veya uyuşturucu/uyarıcı madde etkisi altında gelmesi ya da işyerinde bu maddeleri kullanması hâlinde, İşveren iş sözleşmesini 25/II maddesi uyarınca haklı nedenle ve tazminatsız feshedebilir.'));
-  c.push(bent('b','İşçi, iş sözleşmesi devam ettiği sürece İşverenin yazılı izni olmaksızın, İşveren ile rekabet oluşturan bir işte çalışamaz.'));
-  c.push(bent('c','İşçi, 6698 sayılı KVKK uyarınca görevi sebebiyle öğrendiği kişisel verileri, iş amacı dışında işlemez, aktarmaz ve saklamaz; bu yükümlülük sözleşme sona erdikten sonra da devam eder.'));
+  c.push(bent('b','İşyerinde sigara içilmesi, 4207 sayılı Kanun ile belirlenen alan ve kısıtlamalara tabidir.'));
+  c.push(bent('c','İşçi, iş sözleşmesi devam ettiği sürece İşverenin yazılı izni olmaksızın, İşveren ile rekabet oluşturan bir işte çalışamaz.'));
+  c.push(bent('d','İşçi, 6698 sayılı KVKK uyarınca görevi sebebiyle öğrendiği kişisel verileri, iş amacı dışında işlemez, aktarmaz ve saklamaz; bu yükümlülük sözleşme sona erdikten sonra da devam eder.'));
 
   c.push(maddeBaslik('MADDE 8) GİZLİLİK VE REKABET YASAĞI'));
   c.push(govde('Taraflar, işbu sözleşmenin ayrılmaz eki niteliğinde ayrıca bir "Sadakat, Gizlilik, Sır Saklama ve Rekabet Yasağı Sözleşmesi" akdetmiştir. Ek sözleşme hükümleri taraflar bakımından bağlayıcıdır.'));
@@ -2148,8 +2149,9 @@ function servisIsSozlesmesi(p){
 
   c.push(maddeBaslik('MADDE 7) DİĞER YÜKÜMLÜLÜKLER VE YASAKLAR'));
   c.push(bent('a','Alkol/uyuşturucu etkisi altında işe gelme veya işyerinde kullanım, haklı nedenle ve tazminatsız fesih sebebidir.'));
-  c.push(bent('b','İşçi, İşverenin yazılı izni olmaksızın rakip bir işte çalışamaz; bu yasak, işverenin menfaatiyle çelişmeyen ikinci bir kısmi süreli çalışmayı kapsamaz.'));
-  c.push(bent('c','İşçi, KVKK uyarınca öğrendiği kişisel verileri iş amacı dışında işlemez; bu yükümlülük sözleşme sonrası da devam eder.'));
+  c.push(bent('b','İşyerinde sigara içilmesi 4207 sayılı Kanun\'a tabidir.'));
+  c.push(bent('c','İşçi, İşverenin yazılı izni olmaksızın rakip bir işte çalışamaz.'));
+  c.push(bent('d','İşçi, KVKK uyarınca öğrendiği kişisel verileri iş amacı dışında işlemez; bu yükümlülük sözleşme sonrası da devam eder.'));
 
   c.push(maddeBaslik('MADDE 8) İŞVERENİN YÜKÜMLÜLÜKLERİ'));
   c.push(bent('a','İşveren, işçilik haklarını zamanında ödemek, iş sağlığı-güvenliği tedbirlerini almakla yükümlüdür.'));
@@ -7571,7 +7573,7 @@ window.v134DisciplineRender=function(){
    (tarih/ihbar düzeltmeleri, sözleşme metinleri ve ölü kod temizliği doğrudan
    ilgili fonksiyonlarda yapıldı; bu blok yalnızca yeni akışları içerir)
    ===================================================================== */
-const APP_SURUM = 'v20.30 · 12.10.2026 · Masaüstü';
+const APP_SURUM = 'v20.31 · 12.10.2026 · Masaüstü';
 
 function v14IsGunuEkle(iso,n){
   const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||''); if(!m) return null;
@@ -8063,7 +8065,7 @@ detayEklentiEkle(96,function(pid){
 </script>
 <script id="v-baslatma-birlesik">
 /* ---- v20.1: sürüm, yedek uyarı çubuğu, toplu bakiye ---- */
-const PROGRAM_SURUM='20.30 (12.10.2026)'; window.PROGRAM_SURUM=PROGRAM_SURUM;
+const PROGRAM_SURUM='20.31 (12.10.2026)'; window.PROGRAM_SURUM=PROGRAM_SURUM;
 
 /* v20.1: personel dosyası İzin sekmesi — tüm izin kayıtları (yıllık + mazeret), durum ve işlem düğmeleri */
 function v20IzinListe(p){
