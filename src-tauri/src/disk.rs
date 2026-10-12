@@ -392,6 +392,13 @@ impl Disk {
 
     /// İndirilen belgeyi Belgeler\<gün> (yedek JSON'ları Yedekler\Elle alinan) altına kaydeder.
     /// Aynı ad varsa " (2)", " (3)" ... eklenir; hiçbir dosyanın üzerine yazılmaz.
+    pub fn gunluge_yaz(&self, satir: &str) {
+        use std::io::Write as _;
+        if let Ok(mut f) = fs::OpenOptions::new().create(true).append(true).open(self.kok.join("islem.log")) {
+            let _ = writeln!(f, "{} {}", damga(), satir);
+        }
+    }
+
     pub fn belge_kaydet(&self, ad: &str, veri: &[u8]) -> Result<PathBuf, String> {
         let ad = guvenli_ad(ad);
         let klasor = if yedek_dosyasi_mi(&ad) {

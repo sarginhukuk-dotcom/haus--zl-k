@@ -1,6 +1,6 @@
 [package]
 name = "haus-ozluk"
-version = "20.33.0"
+version = "20.34.0"
 description = "Haus Culture Özlük Otomasyonu"
 authors = ["Av. İsmail Sarğın"]
 edition = "2021"

@@ -199,7 +199,14 @@ fn belge_kaydet(name: String, data_b64: String, st: tauri::State<'_, Durum>) -> 
     let bayt = base64::engine::general_purpose::STANDARD
         .decode(data_b64.as_bytes())
         .map_err(|e| e.to_string())?;
-    let yol = st.disk.belge_kaydet(&name, &bayt)?;
+    let yol = match st.disk.belge_kaydet(&name, &bayt) {
+        Ok(y) => y,
+        Err(e) => {
+            st.disk.gunluge_yaz(&format!("belge_kaydet HATA {}: {}", name, e));
+            return Err(e);
+        }
+    };
+    st.disk.gunluge_yaz(&format!("belge_kaydet tamam {} ({} bayt)", yol.display(), bayt.len()));
     let ilk = {
         let mut g = st.son_belge.lock().unwrap();
         let ilk = g.map_or(true, |t| t.elapsed() > Duration::from_secs(3));
@@ -353,6 +360,12 @@ pub fn run() {
             match std::env::var("HAUS_VERI_KLASORU") {
                 Ok(v) if !v.is_empty() => adaylar.push(PathBuf::from(v)),
                 _ => {
+                    // OneDrive'a yönlendirilmiş Belgeler yerine sistem sürücüsünde sabit klasör (ilk tercih).
+                    #[cfg(windows)]
+                    {
+                        let surucu = std::env::var("SystemDrive").unwrap_or_else(|_| "C:".into());
+                        adaylar.push(PathBuf::from(format!("{}\\", surucu)).join(&firma_k.klasor_adi));
+                    }
                     if let Ok(d) = app.path().document_dir() {
                         adaylar.push(d.join(&firma_k.klasor_adi));
                     }
