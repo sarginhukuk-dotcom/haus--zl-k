@@ -3,7 +3,7 @@ name: Windows kurulum dosyası
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [bala-makina]
 
 jobs:
   kurulum:
@@ -33,6 +33,6 @@ jobs:
       - name: Kurulum dosyasını yükle
         uses: actions/upload-artifact@v4
         with:
-          name: Haus-Culture-Kurulum
+          name: Bala-Makina-Kurulum
           path: src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: error

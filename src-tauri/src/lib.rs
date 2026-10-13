@@ -468,7 +468,7 @@ pub fn run() {
                 Ok(f) => Some(f),
                 Err(e) if e == "kilitli" => {
                     let metin = format!(
-                        "Bu veri klasörü başka bir Haus Culture penceresi tarafından kullanılıyor.\n\nAçık duran başka bir pencere ya da eski sürüm olabilir; onu kapatıp programı yeniden açın.\n\nKlasör: {}",
+                        "Bu veri klasörü başka bir program penceresi tarafından kullanılıyor.\n\nAçık duran başka bir pencere ya da eski sürüm olabilir; onu kapatıp programı yeniden açın.\n\nKlasör: {}",
                         kok.display()
                     );
                     let h = app.handle().clone();
