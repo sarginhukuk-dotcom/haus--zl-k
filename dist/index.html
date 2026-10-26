@@ -976,7 +976,7 @@ details:not(.v212-w),#detayIcerik details{border-left:1px solid var(--hc-line)!i
       </div>
     </fieldset>
 
-    <fieldset id="c_somutWrap" style="display:none"><legend>Somut Fesih Olayı</legend><div class="field"><label>Olayın tarihi, yeri, davranış ve delil/değerlendirme *</label><textarea id="c_somutOlay" rows="3" placeholder="Somut olayı ve fesihle bağını yazın"></textarea></div><div class="field" id="c_savunmaWrap"><label>Savunma süreci</label><select id="c_savunma"><option value="">Seçiniz…</option><option value="alindi">Savunma alındı ve değerlendirildi</option><option value="verilmedi">Savunma istendi; süresinde sunulmadı</option><option value="uygulanmaz">Somut olay bakımından bu usul uygulanmıyor; ayrıca kontrol edildi</option></select></div></fieldset>
+    <fieldset id="c_somutWrap" style="display:none"><legend>Somut Fesih Olayı</legend><div class="field"><label>Olayın tarihi, yeri, davranış ve delil/değerlendirme *</label><textarea id="c_somutOlay" rows="3" placeholder="Somut olayı ve fesihle bağını yazın"></textarea></div><div id="c_somutUyari" class="muted" style="display:none;margin-top:6px;font-size:12px">Serbest fesihte gerekçe yazmak zorunlu değildir. Yazarsanız bildirimde işvereni bağlayan bir beyan olur: gerekçe doğru, ispatlanabilir ve tek tutarlı olmalıdır (örn. aynı anda hem iş azlığı hem performans yazmayın). Emin değilseniz boş bırakın.</div><div class="field" id="c_savunmaWrap"><label>Savunma süreci</label><select id="c_savunma"><option value="">Seçiniz…</option><option value="alindi">Savunma alındı ve değerlendirildi</option><option value="verilmedi">Savunma istendi; süresinde sunulmadı</option><option value="uygulanmaz">Somut olay bakımından bu usul uygulanmıyor; ayrıca kontrol edildi</option></select></div></fieldset>
     <fieldset id="c_ikaleWrap" style="display:none"><legend>İkale (Bozma) Sözleşmesi Bilgileri</legend>
       <div class="field"><label>İkale teklifi kim tarafından yapıldı? *</label><select id="c_ikaleTeklif"><option value="isveren">İşveren tarafından</option><option value="calisan">Çalışan tarafından</option></select></div>
       <div class="grid2">
@@ -1415,12 +1415,12 @@ const AYRILIS_SEBEPLERI = [
 const ALT_SEBEPLER = {
   isveren_hakli: [
     {k:'ahlak_iyiniyet_genel', l:'Ahlak ve İyiniyet Kurallarına Aykırılık (Genel)', dayanak:'4857 m.25/II'},
-    {k:'sadakat_ihlali', l:'Sadakat Borcuna Ağır Aykırılık / Güveni Kötüye Kullanma', dayanak:'4857 m.25/II-e'},
-    {k:'hirsizlik_dolandirma', l:'Hırsızlık, Dolandırıcılık veya Emniyeti Suistimal', dayanak:'4857 m.25/II-e'},
-    {k:'alkol_uyusturucu', l:'Alkol/Uyuşturucu Etkisiyle İşe Gelme', dayanak:'4857 m.25/II-d'},
-    {k:'devamsizlik', l:'Devamsızlık (Ardışık/Tatil Ertesi/Aylık Eşik)', dayanak:'4857 m.25/II-g'},
-    {k:'is_guvenligi_ihlali', l:'İş Güvenliğini Ciddi Şekilde Tehlikeye Düşürme', dayanak:'4857 m.25/II-ı'},
-    {k:'siddet_hakaret', l:'İşyerinde Kavga, Şiddet veya Ağır Hakaret', dayanak:'4857 m.25/II-d'},
+    {k:'sadakat_ihlali', l:'Sadakat Borcuna Ağır Aykırılık / Güveni Kötüye Kullanma', dayanak:'4857 m.25/II'},
+    {k:'hirsizlik_dolandirma', l:'Hırsızlık, Dolandırıcılık veya Emniyeti Suistimal', dayanak:'4857 m.25/II'},
+    {k:'alkol_uyusturucu', l:'Alkol/Uyuşturucu Etkisiyle İşe Gelme', dayanak:'4857 m.25/II'},
+    {k:'devamsizlik', l:'Devamsızlık (Ardışık/Tatil Ertesi/Aylık Eşik)', dayanak:'4857 m.25/II'},
+    {k:'is_guvenligi_ihlali', l:'İş Güvenliğini Ciddi Şekilde Tehlikeye Düşürme', dayanak:'4857 m.25/II'},
+    {k:'siddet_hakaret', l:'İşyerinde Kavga, Şiddet veya Ağır Hakaret', dayanak:'4857 m.25/II'},
     {k:'diger_hakli', l:'Diğer (m.25/II Kapsamında Özel Durum)', dayanak:'4857 m.25/II'},
   ],
   isveren_gecerli: [
@@ -1562,7 +1562,7 @@ const DISIPLIN_KATALOG = [
   {kategori:'fesih', fiil:'Verilen görevi yazılı ihtara rağmen yerine getirmemek', dayanak:'4857 m.25/II-h veya m.18 geçerli neden (davranış)'},
   {kategori:'fesih', fiil:'Zimmetli eşyayı iade etmemek / kasten zarar vermek', dayanak:'4857 m.25/II-ı; zimmet tutanağı'},
   {kategori:'fesih', fiil:'Ortalama olarak benzer işi görenlerden belirgin şekilde daha az verimli çalışmak', dayanak:'4857 m.18 geçerli neden (yetersizlik)'},
-  {kategori:'fesih', fiil:'Yıllık ücretli izni izinsiz ve mazeretsiz olarak 2 iş gününü aşacak şekilde uzatmak', dayanak:'4857 m.25/II-g'},
+  {kategori:'fesih', fiil:'Yıllık ücretli izni izinsiz ve mazeretsiz olarak 2 iş gününü aşacak şekilde uzatmak', dayanak:'4857 m.25/II'},
   {kategori:'fesih', fiil:'İşyerini 30 günlük ücret tutarını aşan şekilde zarara uğratmak', dayanak:'4857 m.25/II-ı (haklı nedenle fesih)'},
 
   // --- GENEL FESİH SEBEPLERİ ---
@@ -2484,7 +2484,7 @@ function iliskikKesmeTutanagi(p, cikisTarihi, sebep, iadeDurumlari, altSebep, di
   c.push(kunye('Görevi', gorevLabel(p)));
   c.push(kunye('İşe Başlama Tarihi', trTarih(p.giris)));
   c.push(kunye('İşten Ayrılış Tarihi', trTarih(cikisTarihi)));
-  c.push(kunye('Ayrılış Sebebi', sebep.l));
+  c.push(kunye('Ayrılış Sebebi', (typeof FESIH_ETIKET!=='undefined'&&FESIH_ETIKET[sebep.k])||sebep.l));
   if(altSebep) c.push(kunye('Somut Sebep', altSebep.l+' ('+altSebep.dayanak+')'));
   c.push(...bos(1));
 
@@ -2511,10 +2511,10 @@ function iliskikKesmeTutanagi(p, cikisTarihi, sebep, iadeDurumlari, altSebep, di
   }
 
   c.push(maddeBaslik((disiplinKayitlari && disiplinKayitlari.length ? '3' : '2')+'- HESAP DURUMU TESPİTİ'));
-  c.push(govde('Personelin işten ayrılış tarihi itibarıyla işyeri kayıtlarının incelenmesi neticesinde, aşağıdaki alacak kalemlerinin bulunduğu ön bilgi mahiyetinde tespit edilmiştir; kesin tutarlar bordro/muhasebe kayıtları üzerinden ayrıca hesaplanacaktır:', {girinti:false}));
+  c.push(govde('Personelin işten ayrılış tarihi itibarıyla işyeri kayıtları üzerinden aşağıdaki kalemler yönünden hesap yapılacaktır. Bu liste yalnızca hesaplanacak kalemleri gösterir; herhangi bir alacağın veya tutarın varlığını ikrar niteliği taşımaz. Kesin tutarlar ve hak doğup doğmadığı bordro/muhasebe kayıtları ile kanuni şartlar üzerinden ayrıca belirlenecektir:', {girinti:false}));
   c.push(bent('a','Hak edilmiş aylık ücret'));
   c.push(bent('b','Fazla çalışma ücreti (varsa)'));
-  c.push(bent('c','Kullanılmayan yıllık izin ücreti'));
+  c.push(bent('c','Kullanılmayan yıllık izin ücreti (varsa)'));
   c.push(bent('d','Kıdem tazminatı (kanuni şartları taşıması hâlinde)'));
   c.push(bent('e','İhbar tazminatı (kanuni şartları taşıması hâlinde)'));
 
@@ -2573,9 +2573,35 @@ function ibraname(p, cikisTarihi, veri){
   return c;
 }
 
+/* Yazılı belgelerde gösterilen etiket: iç etiket (sebep.l) işlem kaydı içindir; yazıda işvereni bağlayıcı sınıflandırmadan kaçınılır. */
+const FESIH_ETIKET = {
+  isveren_hakli:'Haklı Nedenle Derhal Fesih (4857 sayılı İş Kanunu m.25/II)',
+  isveren_saglik:'Sağlık Nedeniyle Fesih (4857 sayılı İş Kanunu m.25/I)',
+  isveren_gecerli:'Geçerli Nedenle Fesih (4857 sayılı İş Kanunu m.18)',
+  isveren_serbest:'Bildirim Süresi Verilerek Fesih (4857 sayılı İş Kanunu m.17)',
+  isveren_zorlayici:'Zorlayıcı Sebeple Fesih (4857 sayılı İş Kanunu m.25/III)',
+  isveren_tutuklu:'Gözaltı veya Tutukluluk Nedeniyle Fesih (4857 sayılı İş Kanunu m.25/IV)'
+};
 function fesihBildirimi(p, cikisTarihi, sebep, altSebep, disiplinKayitlari, ihbarBilgi, olgu){
   olgu=olgu||{somut:p._fesihOlayi||'',savunma:p._fesihSavunma||''};
   const c = [];
+  const ihbarVar = !!(ihbarBilgi && ihbarBilgi.uygulandi);
+  /* Kıdem: kayıtlı işe giriş ve sona erme tarihine göre (ISO karşılaştırma). */
+  let kidemDolu = null;
+  try{
+    if(/^\d{4}-\d{2}-\d{2}$/.test(p.giris||'') && /^\d{4}-\d{2}-\d{2}$/.test(cikisTarihi||'')){
+      kidemDolu = cikisTarihi >= ((parseInt(p.giris.slice(0,4),10)+1)+p.giris.slice(4));
+    }
+  }catch(e){ kidemDolu = null; }
+  const kidemCumlesi = kidemDolu===true
+    ? 'Kıdem tazminatı, 1475 sayılı Kanun\'un 14. maddesindeki şartların gerçekleşmesi hâlinde kanuni esaslara göre hesaplanarak ödenir.'
+    : kidemDolu===false
+      ? 'Kayıtlarımıza göre iş sözleşmenizin sona erme tarihi itibarıyla kıdeminiz bir yılı doldurmadığından, 1475 sayılı Kanun\'un 14. maddesi uyarınca kıdem tazminatı hakkı doğmamaktadır.'
+      : 'Kıdem tazminatı hakkı, 1475 sayılı Kanun\'un 14. maddesindeki şartların (en az bir yıllık kıdem vb.) gerçekleşmesi hâlinde doğar ve kanuni esaslara göre ödenir.';
+  const ihbarCumlesi = ihbarVar
+    ? 'Bildirim süresine uyulduğundan ihbar tazminatı doğmamaktadır.'
+    : 'İş sözleşmesi bildirim süresi verilmeksizin sona erdirildiğinden, bildirim süresine ilişkin ücret tutarındaki ihbar tazminatı kanuni esaslara göre ödenir.';
+
   c.push(baslik('FESİH BİLDİRİMİ', {after:60}));
   c.push(baslik(FIRMA.unvan, {after:240, size:SZ}));
   c.push(kunye('Muhatap', adTitle(p.ad)));
@@ -2583,21 +2609,25 @@ function fesihBildirimi(p, cikisTarihi, sebep, altSebep, disiplinKayitlari, ihba
   c.push(kunye('Görevi', gorevLabel(p)));
   c.push(kunye('İşe Başlama Tarihi', trTarih(p.giris)));
   c.push(...bos(1));
-  if(ihbarBilgi && ihbarBilgi.uygulandi){
+  if(ihbarVar){
     c.push(govde('Aramızda '+trTarih(p.giris)+' tarihinde akdedilen belirsiz süreli iş sözleşmenizin sona erdirileceği, işbu bildirim ile tarafınıza bildirilmektedir. İş sözleşmeniz bildirim süresinin sonunda '+trTarih(cikisTarihi)+' tarihinde sona erecektir.', {girinti:false}));
     c.push(maddeBaslik('BİLDİRİM SÜRESİ'));
     c.push(kunye('Fesih Bildirim Tarihi', trTarih(ihbarBilgi.bildirimTarihi)));
     c.push(kunye('Uygulanacak İhbar Öneli', ihbarBilgi.hafta+' hafta'));
     c.push(kunye('İş Sözleşmesinin Sona Erme Tarihi', trTarih(cikisTarihi)));
-    c.push(govde('4857 sayılı İş Kanunu\'nun 17. maddesi uyarınca kıdeminize göre '+ihbarBilgi.hafta+' haftalık bildirim süresi uygulanacaktır. Bildirim süresi boyunca iş sözleşmesi bütün hak ve yükümlülükleriyle devam eder. İş Kanunu\'nun 27. maddesindeki yeni iş arama iznine ilişkin haklar saklıdır.', {girinti:false}));
+    c.push(govde('4857 sayılı İş Kanunu\'nun 17. maddesi uyarınca kıdeminize göre '+ihbarBilgi.hafta+' haftalık bildirim süresi uygulanacaktır. Bildirim süresi boyunca iş sözleşmesi bütün hak ve yükümlülükleriyle devam eder; bu süre içinde görevlerinizi yerine getirmeye, işyeri düzenine ve iş sağlığı ve güvenliği kurallarına uymaya devam etmeniz gerekir.', {girinti:false}));
+    c.push(govde('İş Kanunu\'nun 27. maddesi uyarınca bildirim süresi içinde günde en az iki saat yeni iş arama izni kullanabilirsiniz; bu izin için ücretinizden kesinti yapılmaz. İş arama izinlerini toplu olarak kullanmak istemeniz hâlinde bu talebinizi İşverene yazılı olarak bildirmeniz gerekir.', {girinti:false}));
+    c.push(govde('İşverenin, 17. maddenin son fıkrası uyarınca bildirim süresine ilişkin ücret tutarındaki tazminatı ödeyerek iş sözleşmesini bildirim süresi dolmadan sona erdirme hakkı ile bildirim süresi içindeki davranışlarınıza ilişkin kanundan doğan hakları saklıdır.', {girinti:false}));
   }else if(sebep.k==='deneme'){
     c.push(govde('Aramızda '+trTarih(p.giris)+' tarihinde başlayan ve halen deneme süresi içinde bulunan iş sözleşmeniz, 4857 sayılı İş Kanunu\'nun 15. maddesi uyarınca bildirim süresine gerek olmaksızın ve tazminatsız olarak, '+trTarih(cikisTarihi)+' tarihi itibarıyla İşveren tarafından feshedilmiştir.', {girinti:false}));
   }else{
     c.push(govde('Aramızda '+trTarih(p.giris)+' tarihinde akdedilen iş sözleşmeniz, aşağıda belirtilen sebeple '+trTarih(cikisTarihi)+' tarihi itibarıyla feshedilmiştir.', {girinti:false}));
   }
   c.push(maddeBaslik('FESİH SEBEBİ'));
-  c.push(govde(sebep.l, {girinti:false}));
-  if(olgu.somut)c.push(govde('Somut olay ve değerlendirme: '+olgu.somut, {girinti:false}));
+  c.push(govde(FESIH_ETIKET[sebep.k]||sebep.l, {girinti:false}));
+  if(olgu.somut){
+    c.push(govde((sebep.k==='isveren_serbest'?'Bildirim amacıyla belirtilen gerekçe: ':'Somut olay ve değerlendirme: ')+olgu.somut, {girinti:false}));
+  }
   if(altSebep){
     c.push(govde('Somut Sebep: '+altSebep.l+' ('+altSebep.dayanak+')', {girinti:false}));
   }
@@ -2614,35 +2644,40 @@ function fesihBildirimi(p, cikisTarihi, sebep, altSebep, disiplinKayitlari, ihba
   }
   c.push(maddeBaslik('HUKUKİ DAYANAK VE SONUÇLARI'));
   if(sebep.k==='isveren_hakli'){
-    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 25. maddesinin (II) numaralı bendi uyarınca İşveren tarafından haklı nedenle ve derhal yapılmıştır; bu nedenle aynı Kanun\'un 17. maddesinde öngörülen bildirim süresine uyulmamış olup ihbar tazminatı hakkı doğmamıştır.', {girinti:false}));
-    c.push(govde('Yürürlükte bulunan 1475 sayılı İş Kanunu\'nun 14. maddesi uyarınca, işveren feshinin 4857 sayılı Kanun\'un 25/II maddesinde sayılan sebeplere dayanması hâlinde kıdem tazminatı ödenmez.', {girinti:false}));
-    c.push(govde('4857 sayılı Kanun\'un 26. maddesi uyarınca haklı fesih hakkı, feshe konu olayın diğer tarafça öğrenildiği günden itibaren altı (6) iş günü ve her hâlde fiilin gerçekleşmesinden itibaren bir (1) yıl içinde kullanılabilir. İşbu fesih, yukarıda belirtilen olay tarihi ile işbu bildirim tarihi arasında geçen süre gözetilerek, anılan hak düşürücü süreler içinde gerçekleştirilmiştir.', {girinti:false}));
+    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 25. maddesinin (II) numaralı bendi uyarınca İşveren tarafından haklı nedenle ve bildirim süresi verilmeksizin derhal yapılmıştır; bu nedenle aynı Kanun\'un 17. maddesindeki bildirim süresine uyulmamış olup ihbar tazminatı doğmamıştır.', {girinti:false}));
+    c.push(govde('Fesih, 4857 sayılı Kanun\'un 25. maddesinin (II) numaralı bendindeki sebeplere dayandığından, 1475 sayılı Kanun\'un 14. maddesi uyarınca kıdem tazminatı ödenmez.', {girinti:false}));
+    c.push(govde('4857 sayılı Kanun\'un 26. maddesindeki altı (6) iş günlük ve bir (1) yıllık süreler, feshe konu olayın İşverence öğrenildiği ve gerçekleştiği tarihler esas alınarak gözetilmiştir.', {girinti:false}));
+    c.push(govde('İşverenin uğradığı zararın tazmini ile fesih sırasında bilinmeyip sonradan öğrenilen haklı nedenlere dayanma hakkı ve kanundan doğan diğer hakları saklıdır.', {girinti:false}));
   }else if(sebep.k==='isveren_saglik'){
-    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 25. maddesinin (I) numaralı bendi kapsamında sağlık nedenine dayanılarak yapılmıştır; bu bent kapsamındaki fesihlerde de aynı Kanun\'un 17. maddesinde öngörülen bildirim süresi uygulanmaz ve ihbar tazminatı hakkı doğmaz.', {girinti:false}));
-    c.push(govde('Sağlık nedenine dayalı işveren feshi, 1475 sayılı Kanun\'un 14. maddesindeki kıdem tazminatını dışlayan istisnalar arasında yer almadığından, kanuni bir yıllık kıdem şartının sağlanmış olması hâlinde kıdem tazminatı hakkı doğar.', {girinti:false}));
-    c.push(govde('m.25/I kapsamındaki fesihlerde; kasıt, derli toplu olmayan yaşayış veya içki düşkünlüğünden doğan hastalıkta devamsızlığın ardı ardına üç iş günü ya da bir ayda beş iş gününü aşması, tedavi edilemez hastalıkta Sağlık Kurulu raporu, diğer hastalık ve kaza hâllerinde ise devamsızlığın aynı Kanun\'un 17. maddesindeki bildirim süresini altı hafta aşması aranır; işbu fesih ilgili şartlar oluştuktan sonra yapılmıştır.', {girinti:false}));
+    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 25. maddesinin (I) numaralı bendi kapsamında sağlık nedenine dayanılarak yapılmıştır; bu bent kapsamındaki fesihlerde aynı Kanun\'un 17. maddesindeki bildirim süresi uygulanmaz ve ihbar tazminatı doğmaz.', {girinti:false}));
+    c.push(govde(kidemCumlesi, {girinti:false}));
+    c.push(govde('m.25/I kapsamındaki fesihlerde; kasıt, derli toplu olmayan yaşayış veya içki düşkünlüğünden doğan hastalıkta devamsızlığın ardı ardına üç iş günü ya da bir ayda beş iş gününü aşması, tedavi edilemez hastalıkta Sağlık Kurulu raporu, diğer hastalık ve kaza hâllerinde ise devamsızlığın aynı Kanun\'un 17. maddesindeki bildirim süresini altı hafta aşması aranır; işbu fesih ilgili şartların gerçekleştiği tespit edildikten sonra yapılmıştır.', {girinti:false}));
   }else if(sebep.k==='isveren_gecerli'){
-    c.push(govde('İşbu fesih, işyerinde otuz veya daha fazla işçi çalıştırılması ve muhatabın en az altı aylık kıdeminin bulunması şartlarının sağlandığı kabulüyle, 4857 sayılı İş Kanunu\'nun 18. maddesi uyarınca geçerli nedene dayanılarak yapılmıştır; fesih sebebi aynı Kanun\'un 19. maddesinin birinci fıkrası uyarınca açık ve kesin şekilde yukarıda belirtilmiştir.', {girinti:false}));
-    c.push(govde('4857 sayılı Kanun\'un 20. maddesi uyarınca, işbu fesih bildiriminin tebliğinden itibaren bir (1) ay içinde, 7036 sayılı İş Mahkemeleri Kanunu\'nun 3. maddesinde öngörülen dava şartı olan arabulucuya başvurmak suretiyle, iş sözleşmesinin feshinin geçersizliğinin tespiti ve işe iade talebiyle dava açma hakkınız saklıdır.', {girinti:false}));
-    c.push(govde('Geçerli nedenle fesihte, 4857 sayılı Kanun\'un 17. maddesi ve 1475 sayılı Kanun\'un 14. maddesi uyarınca kanuni şartların sağlanmış olması kaydıyla kıdem ve ihbar tazminatı hakkı doğar.', {girinti:false}));
+    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 18. maddesi ve devamındaki hükümlerin uygulanma koşullarının (otuz işçi eşiği ve altı aylık kıdem) bulunması hâlinde bu hükümlere uygun olarak, geçerli nedene dayanılarak yapılmıştır; fesih sebebi aynı Kanun\'un 19. maddesinin birinci fıkrası uyarınca açık ve kesin şekilde yukarıda belirtilmiştir. Bu bildirimde anılan hükümlere yer verilmesi, uygulama koşullarının gerçekleştiği anlamına gelmez; bu husus İşverence saklı tutulmuştur.', {girinti:false}));
+    c.push(govde('Kanunun 20. maddesindeki koşulların bulunduğunu ileri sürmeniz hâlinde, 7036 sayılı İş Mahkemeleri Kanunu\'nun 3. maddesi uyarınca, bu bildirimin tebliğinden itibaren bir (1) ay içinde arabulucuya başvurmanız gerektiği hatırlatılır.', {girinti:false}));
+    c.push(govde(ihbarCumlesi+' '+kidemCumlesi, {girinti:false}));
   }else if(sebep.k==='isveren_serbest'){
-    c.push(govde('İşyerinde otuz işçi eşiğinin altında kalınması nedeniyle, 4857 sayılı İş Kanunu\'nun 18-21. maddelerinde düzenlenen iş güvencesi hükümleri (geçerli sebep zorunluluğu ve işe iade usulü) işbu fesihte uygulanmaz; İşveren fesih serbestisine sahiptir.', {girinti:false}));
-    c.push(govde('Bununla birlikte, 4857 sayılı Kanun\'un 17. maddesi uyarınca bildirim süresine uyulması veya ihbar tazminatı ödenmesi, ve 1475 sayılı Kanun\'un 14. maddesindeki kanuni şartların sağlanmış olması kaydıyla kıdem tazminatı ödenmesi zorunludur.', {girinti:false}));
+    c.push(govde('İşbu fesih, İşverenin 4857 sayılı İş Kanunu\'nun 17. maddesi uyarınca iş sözleşmesini bildirim süresi vererek feshetme hakkına dayanmaktadır. İşverence, aynı Kanun\'un 18-21. maddelerindeki iş güvencesi hükümlerinin işyerinde ve iş sözleşmeniz bakımından uygulanmadığı değerlendirilmektedir.', {girinti:false}));
+    if(olgu.somut){
+      c.push(govde('Bununla birlikte, iş güvencesi hükümlerinin uygulanacağı ileri sürülse dahi fesih, yukarıda belirtilen gerekçeye de dayanmaktadır; bu gerekçenin gösterilmesi İşverenin fesih hakkını sınırlandırmaz ve fesih sonrasında öğrenilen diğer sebeplere dayanma hakkı saklıdır.', {girinti:false}));
+    }
+    c.push(govde(ihbarCumlesi+' '+kidemCumlesi, {girinti:false}));
   }else if(sebep.k==='isveren_zorlayici'){
-    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 25. maddesinin (III) numaralı bendi uyarınca, zorlayıcı bir sebeple işyerinde işin bir haftadan fazla durması nedeniyle bildirimsiz yapılmıştır; ihbar tazminatı hakkı doğmamıştır. Kıdem tazminatı hakkı, kanuni şartların sağlanmış olması hâlinde saklıdır.', {girinti:false}));
+    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 25. maddesinin (III) numaralı bendi uyarınca, zorlayıcı bir sebeple işyerinde işin bir haftadan fazla durması nedeniyle bildirimsiz yapılmıştır; ihbar tazminatı doğmamıştır. '+kidemCumlesi, {girinti:false}));
   }else if(sebep.k==='isveren_tutuklu'){
-    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 25. maddesinin (IV) numaralı bendi uyarınca, gözaltına alınma veya tutuklanma nedeniyle devamsızlığın 17. maddedeki bildirim süresini aşması üzerine yapılmıştır. Kıdem ve ihbar tazminatı haklarının doğup doğmadığı mevzuat ve somut olay çerçevesinde değerlendirilecektir.', {girinti:false}));
+    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 25. maddesinin (IV) numaralı bendi uyarınca, gözaltına alınma veya tutuklanma nedeniyle devamsızlığın 17. maddedeki bildirim süresini aşması üzerine yapılmıştır. Tazminat haklarınız, mevzuat ve somut olay çerçevesinde değerlendirilecek olup bu bildirim, kanundan doğan hak ve yükümlülükleri sınırlamaz.', {girinti:false}));
   }else if(sebep.k==='isyeri_kapanis'){
-    c.push(govde('İşbu fesih, işyerinin kapatılması / faaliyetin sona ermesi nedeniyle işletme gereklerine dayanılarak yapılmıştır. Kanuni şartların sağlanmış olması hâlinde kıdem ve ihbar tazminatı hakkınız saklıdır ve mevzuata uygun şekilde ödenecektir.', {girinti:false}));
+    c.push(govde('İşbu fesih, işyerinin kapatılması / faaliyetin sona ermesi nedeniyle işletme gereklerine dayanılarak yapılmıştır. '+ihbarCumlesi+' '+kidemCumlesi, {girinti:false}));
   }else if(sebep.k==='toplu_isci_cikarma'){
-    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 29. maddesi kapsamında toplu işçi çıkarma işlemi çerçevesinde, ilgili bildirimler yapılarak gerçekleştirilmiştir. Kanuni şartların sağlanmış olması hâlinde kıdem ve ihbar tazminatı hakkınız saklıdır; toplu çıkarmanın kesinleşmesinden itibaren altı ay içinde aynı nitelikte iş için işçi alınması hâlinde nitelikleri uygun olanlar tercihen işe çağrılacaktır.', {girinti:false}));
+    c.push(govde('İşbu fesih, 4857 sayılı İş Kanunu\'nun 29. maddesi kapsamında toplu işçi çıkarma işlemi çerçevesinde, ilgili bildirimler yapılarak gerçekleştirilmiştir. '+ihbarCumlesi+' '+kidemCumlesi+' Aynı maddede öngörülen, altı ay içinde aynı nitelikte iş için işçi alınması hâlinde işe alınmaya ilişkin kanuni haklarınız saklıdır.', {girinti:false}));
   }else if(sebep.k==='deneme'){
     c.push(govde('4857 sayılı İş Kanunu\'nun 15. maddesi uyarınca deneme süresi içinde taraflardan her biri iş sözleşmesini bildirim süresine gerek olmaksızın ve tazminatsız feshedebilir; bu nedenle kıdem ve ihbar tazminatı hakkı doğmamıştır.', {girinti:false}));
   }else{
-    c.push(govde('Kanuni şartları taşıması hâlinde kıdem/ihbar tazminatı ve diğer işçilik alacaklarınız, mevzuata uygun şekilde hesaplanarak tarafınıza ödenecektir.', {girinti:false}));
+    c.push(govde('İşbu fesih bakımından '+ihbarCumlesi.charAt(0).toLowerCase()+ihbarCumlesi.slice(1)+' '+kidemCumlesi+' Diğer işçilik alacaklarınız mevzuata uygun şekilde hesaplanır.', {girinti:false}));
   }
   c.push(maddeBaslik('ÇIKIŞ İŞLEMLERİ'));
-  c.push(govde('Çalışılmış süreye ilişkin ücretiniz ile kullanılmayan yıllık izin ücretiniz hesaplanarak mevzuata uygun şekilde ödenecek; zimmetinizde bulunan işyerine ait eşya, ekipman ve belgeleri ayrı bir tutanakla teslim etmeniz gerekmektedir. 4857 sayılı Kanun\'un 28. maddesi uyarınca çalışma belgeniz düzenlenecektir. İşbu bildirim, elden imza karşılığı veya Sözleşmenizde belirtilen tebligat adresinize noter/iadeli taahhütlü posta yoluyla tebliğ edilir.', {girinti:false}));
+  c.push(govde('Çalışılmış süreye ilişkin ücretiniz ile varsa kullanılmamış yıllık izin ücretiniz, kayıtlarımıza göre hesaplanarak kanuni süre ve usullere uygun şekilde ödenecektir. Zimmetinizde bulunan işyerine ait eşya, ekipman ve belgeleri, iş sözleşmenizin sona erdiği tarihe kadar ayrı bir tutanakla teslim etmeniz gerekmektedir; teslim edilmeyen zimmetlere ilişkin İşverenin kanundan doğan hakları saklıdır. 4857 sayılı Kanun\'un 28. maddesi uyarınca çalışma belgeniz düzenlenecektir.', {girinti:false}));
+  c.push(govde('İşbu bildirim, elden imza karşılığı teslim edilir. Teslim alınmaması veya imzadan kaçınılması hâlinde durum tutanakla tespit edilir ve bildirim, Sözleşmede belirtilen tebligat adresine noter veya iadeli taahhütlü posta yoluyla gönderilir.', {girinti:false}));
   c.push(...bos(2));
   c.push(imzaSatiri('İşveren / Yetkili','Tebellüğ Eden (varsa) / Tarih'));
   tebligSatiri(c);
@@ -3765,7 +3800,7 @@ function sebepBilgiGoster(){
     altWrap.style.display='none';
   }
 
-  const somutWrap=document.getElementById('c_somutWrap');if(somutWrap)somutWrap.style.display=ISVEREN_FESIH_SEBEPLERI.includes(sk)?'block':'none';
+  const somutWrap=document.getElementById('c_somutWrap');if(somutWrap)somutWrap.style.display=ISVEREN_FESIH_SEBEPLERI.includes(sk)?'block':'none';{const u=document.getElementById('c_somutUyari');if(u){u.style.display=(sk==='isveren_serbest')?'block':'none'}}
   const somutLabel=somutWrap?.querySelector('label');if(somutLabel)somutLabel.textContent=sk==='isveren_serbest'?'Fesih hakkında açıklama (isteğe bağlı)':'Somut fesih gerekçesi, tarih ve değerlendirme *';
   const savunmaWrap=document.getElementById('c_savunmaWrap');if(savunmaWrap)savunmaWrap.style.display=fesihSavunmaZorunlu(sk,document.getElementById('c_altSebep')?.value)?'block':'none';
   if(savunmaWrap?.style.display==='none')document.getElementById('c_savunma').value='';
@@ -7302,7 +7337,7 @@ window.v134DisciplineRender=function(){
    (tarih/ihbar düzeltmeleri, sözleşme metinleri ve ölü kod temizliği doğrudan
    ilgili fonksiyonlarda yapıldı; bu blok yalnızca yeni akışları içerir)
    ===================================================================== */
-const APP_SURUM = 'v1.0 · 12.10.2026 · Masaüstü';
+const APP_SURUM = 'v1.1 · 26.10.2026 · Masaüstü';
 
 function v14IsGunuEkle(iso,n){
   const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||''); if(!m) return null;
