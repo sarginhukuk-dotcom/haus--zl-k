@@ -2204,59 +2204,102 @@ function basvuruPozisyonLabel(){
 function basvuruBosAlan(etiket, uzun=false){
   return P({spacing:{after:120}, children:[TR({text:etiket+': ',bold:true,font:FONT,size:SZ}),TR({text:uzun?'…………………………………………………………………………………………………………':'………………………………………………………………',font:FONT,size:SZ})]});
 }
+function bfAlan(parcalar){
+  /* parcalar: [[etiket, ağırlık], ...] — sekme ve çizgi (leader) ile doldurulacak boşluklar; tablo kullanılmaz */
+  const W=9700, top=parcalar.reduce((a,x)=>a+(x[1]||1),0);
+  let acc=0; const stops=[]; const runs=[];
+  parcalar.forEach((x,i)=>{
+    acc+=(x[1]||1)/top*W;
+    const pos=Math.round(acc-(i<parcalar.length-1?170:0));
+    stops.push({type:docx.TabStopType.LEFT,position:pos,leader:docx.LeaderType.UNDERSCORE});
+    if(x[0])runs.push(TR({text:x[0]+': ',bold:true,font:FONT,size:SZ}));
+    runs.push(TR({text:'\t',font:FONT,size:SZ}));
+    if(i<parcalar.length-1) runs.push(TR({text:'   ',font:FONT,size:SZ}));
+  });
+  return P({tabStops:stops,spacing:{before:Math.round(60*SK),after:Math.round(110*SK)},children:runs});
+}
+function bfDil(){
+  return P({tabStops:[{type:docx.TabStopType.LEFT,position:4200,leader:docx.LeaderType.UNDERSCORE}],spacing:{before:Math.round(60*SK),after:Math.round(110*SK)},children:[TR({text:'Yabancı dil: ',bold:true,font:FONT,size:SZ}),TR({text:'\t   ',font:FONT,size:SZ}),TR({text:'☐ Başlangıç    ☐ Orta    ☐ İyi    ☐ Çok iyi',font:FONT,size:SZ})]});
+}
+function bfSecenek(soru, secenekler){
+  const r=[TR({text:soru+'  ',font:FONT,size:SZ})];
+  secenekler.forEach(s=>r.push(TR({text:'☐ '+s+'     ',font:FONT,size:SZ})));
+  return P({spacing:{after:Math.round(100*SK)},children:r});
+}
+function bfBaslik(t){ return P({spacing:{before:Math.round(190*SK),after:Math.round(80*SK)},keepNext:true,border:{bottom:{style:docx.BorderStyle.SINGLE,size:6,space:2,color:'888888'}},children:[TR({text:t,bold:true,font:FONT,size:SZ})]}); }
 function isBasvuruBelgesi(opts){
+  return szSar(()=>isBasvuruBelgesi0(opts),21,0.8);
+}
+function isBasvuruBelgesi0(opts){
   const c=[];
-  c.push(baslik('İŞ BAŞVURU VE ÖN BİLGİLENDİRME FORMU',{after:60}));
-  c.push(baslik(FIRMA.unvan,{after:180,size:SZ}));
-  c.push(kunye('Başvuru Tarihi', opts.tarih?trTarih(opts.tarih):'……/……/……………'));
-  c.push(kunye('Başvurulan Pozisyon', opts.pozisyon));
-  c.push(...bos(1));
-  c.push(altBaslik('1- ADAY TARAFINDAN DOLDURULACAK KİŞİSEL BİLGİLER'));
-  ['Adı Soyadı','T.C. Kimlik No','Doğum Tarihi / Yeri','Telefon','E-posta'].forEach(x=>c.push(basvuruBosAlan(x)));
-  c.push(basvuruBosAlan('İkametgâh Adresi',true));
-  c.push(basvuruBosAlan('İşe Başlayabileceği Tarih'));
-  c.push(kutu('Tam süreli çalışabilirim.'));
-  c.push(kutu('Kısmi süreli çalışabilirim.'));
-  c.push(kutu('Vardiyalı çalışabilirim.'));
-  if(opts.deneyim){
-    c.push(altBaslik('2- EĞİTİM VE İŞ DENEYİMİ'));
-    c.push(basvuruBosAlan('Son Mezun Olunan Okul / Bölüm',true));
-    c.push(basvuruBosAlan('Mesleki Eğitim, Kurs veya Sertifikalar',true));
-    c.push(govde('Önceki İş Deneyimleri (işyeri, görev, çalışma tarihleri ve ayrılma nedeni):', {girinti:false}));
-    c.push(govde('1. ……………………………………………………………………………………………………………………………', {girinti:false}));
-    c.push(govde('2. ……………………………………………………………………………………………………………………………', {girinti:false}));
+  const eposta=FIRMA.eposta||'';
+  c.push(baslik('İŞ BAŞVURU FORMU',{after:40}));
+  c.push(baslik(FIRMA.unvan,{after:140,size:SZ}));
+  c.push(bfAlan([['Başvurulan pozisyon / departman',3],['Başvuru tarihi',2]]));
+  c.push(bfSecenek('Başvuru kaynağı:',['Referans','İlan / kariyer sitesi','E-posta','Diğer']));
+  c.push(bfBaslik('1- KİŞİSEL BİLGİLER'));
+  c.push(bfAlan([['Adı soyadı',3],['T.C. kimlik no',2]]));
+  c.push(bfAlan([['Doğum tarihi / yeri',3],['Uyruğu',2]]));
+  c.push(bfAlan([['İkametgâh adresi',1]]));
+  c.push(bfAlan([['Cep telefonu',1],['E-posta',1]]));
+  c.push(bfAlan([['Acil durumda aranacak kişi (ad soyad / yakınlık)',3],['Telefonu',2]]));
+  c.push(bfSecenek('Ehliyet:',['Yok','Var — Sınıfı: ______']));
+  c.push(bfSecenek('Askerlik durumu (erkek adaylar):',['Tamamlandı','Muaf','Tecilli']));
+  c.push(bfBaslik('2- EĞİTİM BİLGİLERİ'));
+  c.push(bfAlan([['Lise (okul / bölüm)',4],['Mezuniyet yılı',1.5]]));
+  c.push(bfAlan([['Ön lisans / lisans (okul / bölüm)',4],['Mezuniyet yılı',1.5]]));
+  c.push(bfAlan([['Yüksek lisans / diğer',4],['Mezuniyet yılı',1.5]]));
+  c.push(bfAlan([['Mesleki eğitim, kurs, sertifika veya yetki belgeleri',1]]));
+  c.push(bfAlan([['',1]]));
+  c.push(bfBaslik('3- İŞ DENEYİMİ (en son işyerinden başlayarak)'));
+  for(let i=1;i<=3;i++){
+    c.push(bfAlan([[i+') İşyeri adı / telefonu',3],['Departman / görevi',2]]));
+    c.push(bfAlan([['Giriş tarihi',1],['Çıkış tarihi',1],['Ayrılma sebebi',2]]));
   }
-  if(opts.referans){
-    c.push(altBaslik('3- REFERANS BİLGİLERİ'));
-    c.push(govde('1. Ad Soyad: …………………………………  Görev/İşyeri: …………………………………  Telefon: …………………………………', {girinti:false}));
-    c.push(govde('2. Ad Soyad: …………………………………  Görev/İşyeri: …………………………………  Telefon: …………………………………', {girinti:false}));
-  }
+  c.push(bfBaslik('4- REFERANSLAR (aile dışından)'));
+  c.push(bfAlan([['1) Ad soyad',2],['Görevi',2],['Telefonu',1.5]]));
+  c.push(bfAlan([['2) Ad soyad',2],['Görevi',2],['Telefonu',1.5]]));
+  c.push(bfBaslik('5- NİTELİKLER'));
+  c.push(bfDil()); c.push(bfDil());
+  c.push(bfAlan([['Bilgisayar / program bilgisi (program ve seviyeleri)',1]]));
+  c.push(bfAlan([['Kullanabildiğiniz makine, tezgâh veya iş ekipmanları',1]]));
+  c.push(bfBaslik('6- ÇALIŞMA TERCİHLERİ VE DİĞER BİLGİLER'));
+  c.push(bfSecenek('Çalışma şekli:',['Tam süreli','Kısmi süreli']));
+  c.push(bfSecenek('Vardiyalı çalışabilir misiniz?',['Evet','Hayır']));
+  c.push(bfSecenek('Gerektiğinde fazla çalışma ve hafta sonu çalışması yapabilir misiniz?',['Evet','Hayır']));
+  c.push(bfSecenek('Şehir dışında / müşteri sahasında görev alabilir misiniz?',['Evet','Hayır']));
+  c.push(bfSecenek('Yapacağınız işi etkileyebilecek bir sağlık durumunuz veya çalışma kısıtınız var mı?',['Hayır','Evet']));
+  c.push(govde('Bu soruya yanıt vermeniz, yalnızca işe uygunluğun ve gerekli iş sağlığı ve güvenliği tedbirlerinin belirlenmesi amacıyla değerlendirilir; ayrıntılı sağlık bilgisi bu aşamada istenmez, işe kabul halinde işyeri hekimi muayenesi yapılır.',{girinti:false}));
+  c.push(bfSecenek('İşyerimizde çalışan bir yakınınız var mı?',['Hayır','Evet — Adı: ________________________']));
+  c.push(bfSecenek('Daha önce firmamızda çalıştınız veya başvuruda bulundunuz mu?',['Hayır','Evet']));
+  c.push(bfAlan([['Halen çalışıyorsanız ayrılma süreniz',3],['İşe başlayabileceğiniz tarih',3]]));
+  c.push(bfAlan([['Talep ettiğiniz aylık net ücret',1]]));
   if(opts.kurallar){
-    c.push(altBaslik('İŞYERİ TEMEL KURALLARI VE ÖN BİLGİLENDİRME'));
+    c.push(bfBaslik('İŞYERİ TEMEL KURALLARI VE ÖN BİLGİLENDİRME'));
     c.push(bent('1','Çalışma düzeni işin ve işletmenin ihtiyacına göre vardiyalı olarak planlanabilir; ilan edilen çalışma ve vardiya saatlerine uyulması beklenir.'));
-    c.push(bent('2','İşe kabul halinde iş sağlığı ve güvenliği kurallarına, iş kıyafeti ve kişisel koruyucu donanım kullanımına ve görev talimatlarına uyulması zorunludur.'));
-    c.push(bent('3','Devamsızlık, geç kalma ve mazeret durumlarının işyeri yetkilisine zamanında bildirilmesi gerekir.'));
-    c.push(bent('4','Müşteri, çalışan ve işletmeye ait bilgi ve belgelerin gizliliğine riayet edilir.'));
-    c.push(bent('5','İşyerine ve personele ait araç, ekipman ve malzemeler özenle kullanılır; teslim edilen zimmetler korunur.'));
-    c.push(bent('6','İşe kabul halinde ayrıntılı çalışma koşulları, iş sözleşmesi ve ilgili işyeri belgeleri ayrıca düzenlenir.'));
+    c.push(bent('2','İşe kabul edilen personel için kanuni deneme süresi (2 ay) uygulanır.'));
+    c.push(bent('3','İşe kabul halinde iş sağlığı ve güvenliği kurallarına, iş kıyafeti ve kişisel koruyucu donanım kullanımına ve görev talimatlarına uyulması zorunludur.'));
+    c.push(bent('4','Devamsızlık, geç kalma ve mazeret durumlarının işyeri yetkilisine zamanında bildirilmesi gerekir.'));
+    c.push(bent('5','Müşteri, çalışan ve işletmeye ait bilgi ve belgelerin gizliliğine riayet edilir.'));
+    c.push(bent('6','İşyerine ve personele ait araç, ekipman ve malzemeler özenle kullanılır; teslim edilen zimmetler korunur.'));
+    c.push(bent('7','İşe kabul halinde ayrıntılı çalışma koşulları, iş sözleşmesi, İşyeri İç Yönetmeliği ve ilgili işyeri belgeleri ayrıca düzenlenir.'));
   }
   if(opts.evraklar){
-    c.push(altBaslik('İŞE KABUL HALİNDE TAMAMLANACAK BELGELER'));
-    ['Kimlik fotokopisi','Yerleşim yeri / adres bilgisi','Diploma veya öğrenim belgesi (görev için gerekli ise)','Banka / IBAN bilgisi','İşe giriş için talep edilen sağlık ve İSG belgeleri','Pozisyon için gerekli mesleki yeterlilik belgesi, sertifika veya yetki belgesi (varsa)'].forEach(x=>c.push(kutu(x)));
+    c.push(bfBaslik('İŞE KABUL HALİNDE TAMAMLANACAK BELGELER'));
+    ['Kimlik fotokopisi','Yerleşim yeri / adres bilgisi','Diploma veya öğrenim belgesi (görev için gerekli ise)','Banka / IBAN bilgisi','İşe giriş için talep edilen sağlık ve İSG belgeleri','Pozisyon için gerekli mesleki yeterlilik belgesi, sertifika veya yetki belgesi (varsa)','Görevin niteliği gereği kanunen aranıyorsa adli sicil kaydı'].forEach(x=>c.push(kutu(x)));
     c.push(govde('İşin ve pozisyonun niteliğine göre ilave belge talep edilebilir.',{girinti:false}));
   }
-  c.push(altBaslik('ADAY BEYANI'));
-  c.push(govde('Bu formda verdiğim bilgilerin doğru olduğunu; işe kabul edilmem halinde çalışma koşullarının ayrıca düzenlenecek iş sözleşmesi ve işyeri belgeleriyle belirleneceğini; yukarıdaki temel işyeri kuralları hakkında bilgilendirildiğimi beyan ederim.',{girinti:false}));
-  c.push(...bos(1)); c.push(imzaSatiri('Tarih: ……/……/……………','Aday Ad Soyad / İmza'));
+  c.push(bfBaslik('ADAY BEYANI'));
+  c.push(govde('Bu formda verdiğim bilgilerin ve beyanların doğru, eksiksiz ve gerçeğe uygun olduğunu; bu bilgilerin olası bir iş sözleşmesinin kurulmasında esas alınacağını; gerçeğe aykırı veya eksik bilgi verdiğimin sonradan anlaşılması hâlinde 4857 sayılı İş Kanunu\'nun 25/II-(a) maddesi uyarınca iş sözleşmemin haklı nedenle, ihbarsız ve tazminatsız feshedilebileceğini; işe kabul edilmem halinde çalışma koşullarının ayrıca düzenlenecek iş sözleşmesi, İşyeri İç Yönetmeliği ve işyeri belgeleriyle belirleneceğini ve kanuni deneme süresinin uygulanacağını; yukarıdaki temel işyeri kuralları hakkında bilgilendirildiğimi beyan ederim.',{girinti:false}));
+  c.push(govde('Kişisel verilerimin, 6698 sayılı Kanun kapsamında, başvurumun değerlendirilmesi, işe uygunluğun belirlenmesi ve işe alım sürecinin yürütülmesi amacıyla '+FIRMA.unvan+' tarafından işleneceğini; işe kabul edilmemem halinde bu verilerin Şirketin saklama ve imha politikası uyarınca silineceğini, yok edileceğini veya anonim hâle getirileceğini; ayrıntılı Aydınlatma Metni\'nin işe kabul aşamasında tarafıma verileceğini; haklarımı'+(eposta?' '+eposta+' adresine':' Şirkete')+' başvurarak kullanabileceğimi bilgilendirildim.',{girinti:false}));
+  c.push(bfAlan([['Adı soyadı',3],['Tarih',1.5],['İmza',2]]));
   if(opts.onsekizAlti){
-    c.push(altBaslik('18 YAŞINDAN KÜÇÜK ADAY İÇİN VELİ / VASİ MUVAFAKATİ'));
-    c.push(basvuruBosAlan('Veli / Vasi Adı Soyadı'));
-    c.push(basvuruBosAlan('T.C. Kimlik No'));
-    c.push(basvuruBosAlan('Yakınlığı / Sıfatı'));
-    c.push(basvuruBosAlan('Telefon'));
-    c.push(basvuruBosAlan('Adres',true));
-    c.push(govde('Velisi/vasisi bulunduğum yukarıda bilgileri yer alan küçüğün iş başvurusunda bulunmasına ve, yürürlükteki mevzuatın çocuk ve genç işçilere ilişkin sınırlamaları saklı kalmak kaydıyla, işe kabul edilmesi halinde çalışmasına muvafakat ediyorum.',{girinti:false}));
-    c.push(...bos(1)); c.push(imzaSatiri('Tarih: ……/……/……………','Veli / Vasi Ad Soyad / İmza'));
+    c.push(bfBaslik('18 YAŞINDAN KÜÇÜK ADAY İÇİN VELİ / VASİ MUVAFAKATİ'));
+    c.push(bfAlan([['Veli / vasi adı soyadı',3],['T.C. kimlik no',2]]));
+    c.push(bfAlan([['Yakınlığı / sıfatı',2],['Telefon',2]]));
+    c.push(bfAlan([['Adres',1]]));
+    c.push(govde('Velisi/vasisi bulunduğum yukarıda bilgileri yer alan küçüğün iş başvurusunda bulunmasına ve, yürürlükteki mevzuatın çocuk ve genç işçilere ilişkin sınırlamaları saklı kalmak kaydıyla, işe kabul edilmesi hâlinde çalışmasına muvafakat ederim.',{girinti:false}));
+    c.push(bfAlan([['Veli / vasi adı soyadı',3],['Tarih',1.5],['İmza',2]]));
   }
   return c;
 }
