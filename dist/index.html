@@ -2063,7 +2063,10 @@ async function docxBlob(children){
   const A4={width:11906,height:16838};
   let sections;
   if(children.kvkkCompact){
-    sections=[{ properties:{page:{size:A4,margin:{top:700,bottom:700,left:760,right:760}},column:{count:2,space:360,equalWidth:true}}, children }];
+    const mg={top:700,bottom:700,left:760,right:760};
+    /* sondaki kesintisiz tek sütunlu bölüm, Word'de iki sütunun dengeli (yarı yarıya) dağılmasını sağlar */
+    sections=[{ properties:{page:{size:A4,margin:mg},column:{count:2,space:360,equalWidth:true}}, children },
+              { properties:{type:docx.SectionType.CONTINUOUS,page:{size:A4,margin:mg}}, children:[new docx.Paragraph({spacing:{before:0,after:0,line:20},children:[]})] }];
   } else if(!tasarruf){
     sections=[{ properties: sayfaAyari(), children }];
   } else {
@@ -2104,20 +2107,21 @@ async function docxBlob(children){
    ORTAK ÖZLÜK FORMLARI
    ===================================================================== */
 
+const KS=21;
 function kvkkSatir(text, kalin=false){
-  return P({spacing:{after:40,line:228},alignment:docx.AlignmentType.BOTH,children:[TR({text,font:FONT,size:16,bold:kalin})]});
+  return P({spacing:{after:40,line:228},alignment:docx.AlignmentType.BOTH,children:[TR({text,font:FONT,size:KS,bold:kalin})]});
 }
 function kvkkMadde(text){
-  return P({spacing:{after:20,line:228},indent:{left:240,hanging:170},children:[TR({text:'• '+text,font:FONT,size:16})]});
+  return P({spacing:{after:20,line:228},indent:{left:240,hanging:170},children:[TR({text:'• '+text,font:FONT,size:KS})]});
 }
 function kvkkBaslik(text){
-  return P({spacing:{before:70,after:30,line:228},keepNext:true,children:[TR({text,font:FONT,size:17,bold:true})]});
+  return P({spacing:{before:70,after:30,line:228},keepNext:true,children:[TR({text,font:FONT,size:KS+1,bold:true})]});
 }
 function kvkkBaslikAna(text){
-  return P({alignment:docx.AlignmentType.CENTER,spacing:{after:60,line:240},children:[TR({text,font:FONT,size:20,bold:true})]});
+  return P({alignment:docx.AlignmentType.CENTER,spacing:{after:60,line:240},children:[TR({text,font:FONT,size:KS+3,bold:true})]});
 }
 function kvkkImza(sol,sag){
-  return P({spacing:{before:90,after:0,line:228},tabStops:[{type:docx.TabStopType.RIGHT,position:4900}],children:[TR({text:sol,font:FONT,size:16,bold:true}),TR({text:'\t'+sag,font:FONT,size:16,bold:true})]});
+  return P({spacing:{before:90,after:0,line:228},tabStops:[{type:docx.TabStopType.RIGHT,position:4900}],children:[TR({text:sol,font:FONT,size:KS,bold:true}),TR({text:'\t'+sag,font:FONT,size:KS,bold:true})]});
 }
 function kvkkAydinlatma(p){
   p=p||{};
@@ -7704,7 +7708,7 @@ window.v134DisciplineRender=function(){
    (tarih/ihbar düzeltmeleri, sözleşme metinleri ve ölü kod temizliği doğrudan
    ilgili fonksiyonlarda yapıldı; bu blok yalnızca yeni akışları içerir)
    ===================================================================== */
-const APP_SURUM = 'v2.0 · 05.11.2026 · Masaüstü';
+const APP_SURUM = 'v2.0 · 06.11.2026 · Masaüstü';
 
 function v14IsGunuEkle(iso,n){
   const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||''); if(!m) return null;
