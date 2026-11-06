@@ -2064,7 +2064,15 @@ async function docxBlob(children){
   const tasarruf = FIRMA.tasarruf!==false; /* kâğıt tasarrufu: dar kenar boşluğu + (işaretli belgelerde) madde gövdesi iki sütun; metne dokunulmaz */
   const A4={width:11906,height:16838};
   let sections;
-  if(children.kvkkCompact){
+  if(children.kvkkKol && Number.isInteger(children.kolonBas) && Number.isInteger(children.kolonSon)){
+    const mg={top:700,bottom:700,left:760,right:760};
+    const arr=Array.from(children);
+    sections=[
+      {properties:{page:{size:A4,margin:mg}}, children:arr.slice(0,children.kolonBas)},
+      {properties:{type:docx.SectionType.CONTINUOUS,page:{size:A4,margin:mg},column:{count:2,space:360,equalWidth:true}}, children:arr.slice(children.kolonBas,children.kolonSon)},
+      {properties:{type:docx.SectionType.CONTINUOUS,page:{size:A4,margin:mg}}, children:arr.slice(children.kolonSon)}
+    ];
+  } else if(children.kvkkCompact){
     const mg={top:700,bottom:700,left:760,right:760};
     /* sondaki kesintisiz tek sütunlu bölüm, Word'de iki sütunun dengeli (yarı yarıya) dağılmasını sağlar */
     sections=[{ properties:{page:{size:A4,margin:mg},column:{count:2,space:360,equalWidth:true}}, children },
@@ -2155,35 +2163,79 @@ function kvkkAydinlatma(p){
   return c;
 }
 
+function rzP(text,o){o=o||{};return P({spacing:{before:o.before||0,after:o.after===undefined?50:o.after,line:236},alignment:o.al||docx.AlignmentType.BOTH,keepNext:!!o.keep,indent:o.indent,children:[TR({text,font:FONT,size:o.size||19,bold:!!o.bold})]});}
+function rzBaslik(t){return rzP(t,{bold:true,before:90,after:40,keep:true,size:20,al:docx.AlignmentType.LEFT});}
+function rzMadde(no,t){return P({spacing:{after:40,line:236},alignment:docx.AlignmentType.BOTH,indent:{left:400,hanging:400},children:[TR({text:no+'\t',font:FONT,size:19,bold:true}),TR({text:t,font:FONT,size:19})],tabStops:[{type:docx.TabStopType.LEFT,position:400}]});}
 function kvkkAcikRiza(p){
   p=p||{};
   const kam=FIRMA.kamera!==false, pdks=!!FIRMA.pdks;
-  const c=[];c.kvkkCompact=true;
   const giris=p.giris?trTarih(p.giris):'……/……/…………';
-  c.push(kvkkBaslikAna('KİŞİSEL VERİLERİN KORUNMASI AÇIK RIZA BEYANI'));
-  c.push(kvkkBaslik('1) TARAFLAR'));
-  c.push(kvkkSatir('İŞVEREN: '+FIRMA.unvan+' ('+FIRMA.adres+')'));
-  c.push(kvkkSatir('İŞÇİ: Adı soyadı: '+(p.ad?adTitle(p.ad):'………………………………')+'  |  T.C. kimlik no: '+(p.tc||'………………………………')));
-  c.push(kvkkBaslik('2) BEYANIN KONUSU'));
-  c.push(kvkkSatir('6698 sayılı Kişisel Verilerin Korunması Kanunu gereğince verilerin otomatik veya otomatik olmayan yollarla kaydedilmesi, işlenmesi, tasniflenmesi, açıklanması, aktarılması, anonim hâle getirilmesi ve devredilmesidir.'));
-  c.push(kvkkBaslik('3) MADDELER'));
-  c.push(kvkkSatir('1- '+giris+' tarihinde İŞVEREN\'in işyerinde çalışmaya başlayan İŞÇİ, SGK, Maliye ve diğer kamu kurum ve kuruluşlarınca istenen belgelerde yer alan bilgilerin doldurulması amacıyla kimlik kartında yer alan verileri kendi özgür iradesiyle ve açık rızasıyla İŞVEREN\'e vermiştir.'));
-  const liste=[];
-  if(pdks)liste.push('parmak izini, yüz ve göz tarama iznini');
-  if(kam)liste.push('kamera ile izleme iznini');
-  liste.push('özgeçmiş bilgisini (CV), T.C. kimlik numarasını, cep telefonu numarasını, e-posta adresini, adres bilgilerini, aile bilgisini, eğitim durumunu, sabıka kaydını, banka hesap numaralarını, sosyal güvenlik bilgilerini, ehliyet bilgilerini, fotoğrafını, engellilik, rapor, icra, nafaka ve benzeri durumlarını');
-  c.push(kvkkSatir('2- İŞÇİ; '+liste.join('; ')+' kendi özgür iradesiyle ve açık rızasıyla, kanuni amaçlar doğrultusunda kullanılmak üzere İŞVEREN\'e vermiştir.'));
-  c.push(kvkkSatir('3- İŞÇİ, işin gerekleri açısından kamu kurum ve kuruluşlarınca şimdi veya daha sonra istenecek diğer bilgileri de İŞVEREN\'e kendi özgür iradesiyle ve açık rızasıyla verecektir.'));
-  c.push(kvkkSatir('4- İŞÇİ, kişisel verilerinde sonradan meydana gelecek değişiklikleri İŞVEREN\'e bildirecektir. Verilerin doğruluğu ve güncelliğinden İŞÇİ sorumludur.'));
-  c.push(kvkkSatir('5- İŞVEREN, İŞÇİ\'ye ait ırk, etnik köken, siyasi düşünce, felsefi inanç, din, mezhep veya diğer inançlar, kılık ve kıyafet, dernek, vakıf veya sendika üyeliği, sağlık, cinsel hayat, sabıka kaydı ve güvenlik tedbirleriyle ilgili veriler ile biyometrik ve genetik veriler gibi özel nitelikli kişisel verileri, kanunda öngörülen hâller ve bu beyan hariç, üçüncü kişilerle paylaşmayacaktır. Bu veriler, kanunda öngörülen hâllerde veya İŞÇİ\'nin açık rızası alınmak suretiyle otomatik ya da otomatik olmayan yollarla işlenebilecektir.'));
-  c.push(kvkkSatir('6- İŞVEREN, bu beyanda yazılı kişisel verileri; veri sorumlusu, SGK yetkilileri, Maliye yetkilileri, T.C. Aile ve Sosyal Hizmetler ile Çalışma ve Sosyal Güvenlik Bakanlığı yetkilileri, T.C. Hazine ve Maliye Bakanlığı yetkilileri, TÜİK yetkilileri, diğer kamu kurum ve kuruluşları yetkilileri, bireysel emeklilik (BES) şirketleri, İŞVEREN\'in işyerinde çalışan insan kaynakları yetkilileri, hukuki işlerine bakan meslek mensupları ve muhasebe işlerine bakan meslek mensupları ile kanunen yetkili merciler dışındaki üçüncü kişilere vermeyecektir.'));
-  c.push(kvkkSatir('7- İŞVEREN; İŞÇİ\'ye ait verileri kâğıt ortamında, elektronik ortamda, elektronik araçlarda (harddisk, flash bellek, CD, DVD vb.) ve sanal ortamlarda (internet, bulut sistemleri) bulundurabilir, depolayabilir ve işleyebilir.'));
-  c.push(kvkkSatir('8- İŞVEREN, verilerin güvenli ortamlarda saklanması için idari, teknik ve hukuki tedbirleri alacak; verileri hukuka uygun ve meşru amaçlar doğrultusunda işleyecektir.'));
-  c.push(kvkkSatir('9- İŞÇİ\'ye ait tüm veriler, ilgili kanunlarda yazılı süreler dolduktan sonra İŞVEREN tarafından kâğıt, elektronik ortam, elektronik araçlar ve sanal ortamlardan geri döndürülemeyecek şekilde silinecek veya yok edilecektir.'));
-  c.push(kvkkSatir('10- İŞÇİ\'ye bu beyanda yazılı bütün maddeler okunmuş, bilgilendirme yapılmış ve izah edilmiştir. İŞÇİ, tüm maddelerde geçen kişisel verilerinin otomatik veya otomatik olmayan yollarla kaydedilmesine, işlenmesine, tasniflenmesine, açıklanmasına, aktarılmasına, anonim hâle getirilmesine ve devredilmesine kendi özgür iradesiyle ve açık rızasıyla onay vermiştir. İŞÇİ, rızasını dilediği zaman İŞVEREN\'e bildirerek geri alabilir; geri alma ileriye etkilidir ve kanuni yükümlülüklere dayanan veri işleme faaliyetlerini etkilemez.'));
-  c.push(kvkkSatir('11- İşbu beyan '+giris+' tarihinde imza altına alınmış ve 11 maddeden oluşmaktadır.'));
-  c.push(kvkkImza('İŞÇİ','İŞVEREN'));
-  c.push(kvkkImza(p.ad?adTitle(p.ad):'',FIRMA.unvan));
+  const ad=p.ad?adTitle(p.ad):'………………………………';
+  const c=[];
+  c.push(P({alignment:docx.AlignmentType.CENTER,spacing:{after:40},children:[TR({text:'KİŞİSEL VERİLERİN KORUNMASI',font:FONT,size:28,bold:true})]}));
+  c.push(P({alignment:docx.AlignmentType.CENTER,spacing:{after:140},children:[TR({text:'AÇIK RIZA BEYANI',font:FONT,size:28,bold:true})]}));
+  c.push(rzBaslik('1) TARAFLAR'));
+  c.push(rzP('VERİ SORUMLUSU (İŞVEREN)\t: '+FIRMA.unvan+' — '+FIRMA.adres,{al:docx.AlignmentType.LEFT,after:40,indent:{left:2600,hanging:2600}}));
+  c.push(rzP('İŞÇİ\t: '+ad+' (T.C. Kimlik No: '+(p.tc||'………………………………')+')',{al:docx.AlignmentType.LEFT,after:40,indent:{left:2600,hanging:2600}}));
+  c.push(rzP('İŞE BAŞLAMA TARİHİ\t: '+giris,{al:docx.AlignmentType.LEFT,after:80,indent:{left:2600,hanging:2600}}));
+  c.kolonBas=c.length;
+  c.push(rzBaslik('2) BEYANIN KONUSU VE HUKUKİ DAYANAK'));
+  c.push(rzP('İşbu beyan; 6698 sayılı Kişisel Verilerin Korunması Kanunu ("Kanun") uyarınca, İŞÇİ\'ye ait kişisel verilerin iş sözleşmesinin kurulması, yürütülmesi ve sona ermesi ile bunlara bağlı yasal yükümlülüklerin yerine getirilmesi amacıyla otomatik veya otomatik olmayan yollarla elde edilmesi, kaydedilmesi, saklanması, değiştirilmesi, sınıflandırılması, açıklanması, aktarılması, devralınması, anonim hâle getirilmesi ve Kanun\'da sayılan diğer işleme faaliyetlerine ilişkin İŞÇİ\'nin açık rızasını içermektedir. İŞÇİ, kendisine Aydınlatma Metni ayrıca verildiğini, hangi verilerinin hangi amaçlarla, hangi hukuki sebeplere dayanılarak işleneceğini ve Kanun\'un 11. maddesindeki haklarını öğrendiğini kabul eder.'));
+  c.push(rzBaslik('3) İŞLENECEK KİŞİSEL VERİLER'));
+  c.push(rzMadde('3.1','Kimlik ve iletişim verileri: ad, soyad, T.C. kimlik numarası, doğum yeri ve tarihi, medeni hâl, nüfus cüzdanı/kimlik kartı bilgileri ve suretleri, cep telefonu numarası, e-posta adresi, ikametgâh ve adres bilgileri, acil durumda ulaşılacak kişilerin ad ve telefon bilgileri.'));
+  c.push(rzMadde('3.2','Özlük ve mesleki veriler: özgeçmiş (CV), iş başvuru formu, eğitim ve diploma/sertifika bilgileri, mesleki yeterlilik ve ustalık belgeleri, önceki iş deneyimi, ehliyet ve diğer izin/belge bilgileri, fotoğraf, referans bilgileri, performans, devam ve disiplin kayıtları, iş sağlığı ve güvenliği eğitim kayıtları.'));
+  c.push(rzMadde('3.3','Mali ve sosyal güvenlik verileri: banka hesap ve IBAN bilgileri, SGK sicil ve sigortalılık bilgileri, ücret, prim, ikramiye, avans, yan haklar ve kesinti bilgileri, bireysel emeklilik (BES) bilgileri, icra ve nafaka kesintisine ilişkin bilgiler, vergi indirimine esas aile ve bakmakla yükümlü olunan kişi bilgileri.'));
+  c.push(rzMadde('3.4','Aile bilgileri: eş ve çocuklara ait ad, soyad, doğum tarihi, T.C. kimlik numarası ve öğrenim durumu gibi; evlilik, doğum, çocuk yardımı, vergi ve sosyal güvenlik mevzuatından doğan hak ve yükümlülüklerin yerine getirilmesi için gerekli bilgiler.'));
+  c.push(rzMadde('3.5','Çalışma ve kullanım verileri: işe giriş-çıkış, puantaj, mesai, izin, rapor ve devamsızlık kayıtları; işyerine ait telefon, bilgisayar, e-posta, internet, yazılım ve benzeri araçların kullanımına ilişkin kayıtlar; iş araç ve ekipmanlarının zimmet ve kullanım kayıtları; araç kullanılıyorsa konum ve güzergâh kayıtları.'));
+  c.push(rzMadde('3.6','Özel nitelikli kişisel veriler (Kanun m.6): sağlık raporları, işe giriş ve periyodik sağlık muayeneleri, iş kazası ve meslek hastalığı kayıtları, engellilik durumu ve oranı, gebelik, doğum ve süt izni ile ilgili belgeler, kan grubu, sabıka kaydı ve güvenlik tedbirlerine ilişkin veriler'+(pdks?', parmak izi, yüz ve göz taraması gibi biyometrik veriler':'')+', dernek, vakıf veya sendika üyeliği, kılık ve kıyafet bilgisi ile iş sözleşmesinin gereği olarak öğrenilmesi zorunlu olan diğer özel nitelikli veriler.'));
+  const sirket=[];
+  sirket.push('Kartlı geçiş ve personel devam kontrol sistemi kapsamında kart okutma suretiyle yapılan işyerine giriş-çıkış, mesai başlangıç-bitiş, devam ve çalışma süresi kayıtları (kart numarası, okutma tarihi, saati ve geçiş noktası)');
+  if(kam)sirket.push('İşyerinde bulunan güvenlik kameraları aracılığıyla görüntü kayıtları (kamera ile izleme)');
+  if(pdks)sirket.push('Parmak izi, yüz ve göz tarama gibi biyometrik veriler');
+  let n=7;
+  {c.push(rzMadde('3.7','Giriş-çıkış, görsel ve biyometrik veriler: '+sirket.join('; ')+'. Bu veriler, işyeri güvenliği, can ve mal güvenliğinin sağlanması, giriş-çıkış ve çalışma süresinin doğru tespiti ile hukuki uyuşmazlıklarda delil olarak kullanılması amaçlarıyla işlenir. Kamera sistemi; çalışanların mahremiyetini ihlal edecek alanlarda (soyunma odası, tuvalet, dinlenme alanı vb.) kullanılmaz.'));}
+  c.push(rzBaslik('4) İŞLEME AMAÇLARI'));
+  c.push(rzMadde('4.1','İş sözleşmesinin kurulması, yürütülmesi, ücret ve diğer hakların ödenmesi, sona erdirilmesi ve sona ermeden sonraki yasal sürelerin gereklerinin yerine getirilmesi.'));
+  c.push(rzMadde('4.2','4857 sayılı İş Kanunu, 5510 sayılı Sosyal Sigortalar ve Genel Sağlık Sigortası Kanunu, 6331 sayılı İş Sağlığı ve Güvenliği Kanunu, 193 sayılı Gelir Vergisi Kanunu, 6098 sayılı Türk Borçlar Kanunu, 6102 sayılı Türk Ticaret Kanunu ve ilgili mevzuatın bildirim ve belge saklama yükümlülüklerinin gerektirdiği tüm kanuni yükümlülüklerin yerine getirilmesi; SGK, Maliye, İŞKUR, Çalışma ve Sosyal Güvenlik Bakanlığı, TÜİK ve diğer yetkili kurumlara bildirim ve beyanların yapılması.'));
+  c.push(rzMadde('4.3','İş sağlığı ve güvenliği önlemlerinin alınması, işe giriş ve periyodik sağlık kontrollerinin yaptırılması, iş kazası ve meslek hastalığı süreçlerinin yürütülmesi, iş sağlığı ve güvenliği eğitimlerinin verilmesi ve kayıtlarının tutulması.'));
+  c.push(rzMadde('4.4','İş süreçlerinin planlanması ve yürütülmesi, görev ve iş dağılımı, performans ve verimlilik değerlendirmesi, eğitim ve gelişim faaliyetleri, terfi, görev ve unvan değişiklikleri, disiplin süreçlerinin yürütülmesi.'));
+  c.push(rzMadde('4.5','İşyeri düzeninin, iş güvenliğinin, bilgi güvenliğinin ve ticari sırların korunması; işyeri araç, gereç, makine, bilgisayar, e-posta ve benzeri iş araçlarının amacına uygun kullanılmasının denetimi; İŞVEREN\'in meşru menfaatlerinin korunması.'));
+  c.push(rzMadde('4.6','Olası hukuki uyuşmazlıklarda hak ve alacakların ileri sürülmesi, savunma yapılması, delillerin saklanması; mahkeme, icra, savcılık ve diğer yetkili merciler ile arabuluculuk ve iş müfettişliği taleplerinin karşılanması.'));
+  c.push(rzMadde('4.7','Acil durumlarda İŞÇİ\'nin yakınlarına ve yetkili sağlık kuruluşlarına ulaşılması; İŞÇİ\'ye özel sağlık sigortası, BES, yemek, servis, yıllık izin, avans ve benzeri yan hakların sağlanması.'));
+  c.push(rzBaslik('5) AÇIK RIZA VERİLEN KONULAR'));
+  c.push(rzP('İŞÇİ, yukarıda sayılan kişisel verilerinin ve özel nitelikli kişisel verilerinin, belirtilen amaçlarla sınırlı kalmak üzere, özellikle aşağıdaki hususlarda özgür iradesiyle ve açık rızasıyla işlenmesine izin verdiğini beyan eder:',{after:60}));
+  const ad5=[];
+  ad5.push('Kimlik kartında ve diğer belgelerde yer alan bilgilerin SGK, Maliye ve diğer kamu kurum ve kuruluşlarınca istenen belge, bildirge ve formlara aktarılması ve bu kurumlara bildirilmesi;');
+  ad5.push('Kimlik, adres, iletişim, eğitim, aile, sabıka, banka, sosyal güvenlik, ehliyet, fotoğraf, engellilik, rapor, icra ve nafaka bilgilerinin özlük dosyasında tutulması;');
+  ad5.push('Sağlık raporları, işe giriş ve periyodik muayene sonuçları, iş kazası/meslek hastalığı ve engellilik gibi özel nitelikli verilerin; iş sağlığı ve güvenliği mevzuatı, sosyal güvenlik mevzuatı ve işin gerektirdiği ölçüde işlenmesi ve yetkili iş yeri hekimi ile uzmanları, SGK ve ilgili kurumlarla paylaşılması;');
+  ad5.push('İşyerine giriş-çıkışta ve mesai takibinde kartlı geçiş sisteminin kullanılması; kart okutma kayıtlarının (kart numarası, tarih, saat, geçiş noktası) giriş-çıkış, devam, fazla mesai, izin ve ücret hesabı ile işyeri güvenliği amaçlarıyla işlenmesi, saklanması ve gerektiğinde hukuki süreçlerde delil olarak kullanılması; kartın İŞÇİ\'ye zimmetlenmesi, başkasına devredilmemesi ve kaybı hâlinde derhâl bildirilmesi;');
+  if(pdks)ad5.push('Ayrıca, kullanılması hâlinde parmak izi, yüz ve göz tarama yöntemleriyle işe giriş-çıkış ve çalışma sürelerinin kayıt altına alınması, bu biyometrik verilerin PDKS cihaz ve yazılımında saklanması;');
+  if(kam)ad5.push('İşyeri güvenliği amacıyla işyerinin ortak kullanım ve çalışma alanlarında kamera ile görüntü kaydı yapılması, kayıtların sınırlı süreyle saklanması ve gerektiğinde hukuki süreçlerde delil olarak kullanılması;');
+  ad5.push('İşyerine ait telefon, bilgisayar, e-posta, internet ve benzeri iş araçlarının yalnızca iş amacıyla kullanılması ve bu kullanıma ilişkin kayıtların işyeri güvenliği ve bilgi güvenliği kapsamında incelenebilmesi;');
+  ad5.push('İş akışının gereği olarak İŞÇİ\'nin adının, soyadının, unvanının, görevinin ve iş telefon/e-posta bilgilerinin iş ilişkisinde bulunulan müşteri, tedarikçi ve resmî kurumlarla paylaşılması;');
+  ad5.push('Kamu kurum ve kuruluşlarınca şimdi veya daha sonra istenecek diğer bilgilerin, işin gereği olarak İŞVEREN\'e verilmesi ve bu amaçla işlenmesi;');
+  ad5.push('İş ilişkisinin gereği olarak işyeri iletişim kanallarında (telefon, SMS, e-posta, WhatsApp ve benzeri mesajlaşma grupları) vardiya, görev, duyuru ve acil durum bildirimlerinin yapılabilmesi için telefon numarasının ve iletişim bilgilerinin bu amaçla kullanılması;');
+  ad5.push('İşyerinin faaliyetleri sırasında, işin niteliği gereği çekilen fotoğraf ve video kayıtlarında (kurumsal tanıtım, sosyal medya ve internet sitesi dâhil) İŞÇİ\'nin görüntüsünün yer alabilmesi; bu kullanımın İŞÇİ\'nin onurunu ve kişilik haklarını zedelemeyecek biçimde yapılması;');
+  ad5.push('İşyeri tarafından sağlanan servis, yemek, konaklama, özel sağlık sigortası, hediye, ikramiye ve benzeri sosyal imkânların sağlanması için gerekli bilgilerin ilgili hizmet sağlayıcılarla paylaşılması;');
+  ad5.push('İş akdinin sona ermesinden sonra da yasal saklama ve zamanaşımı süreleri boyunca, hukuki uyuşmazlıklarda kullanılmak üzere özlük dosyasının muhafaza edilmesi.');
+  ad5.forEach((t,i)=>c.push(rzMadde('('+String.fromCharCode(97+i)+')',t)));
+  c.push(rzBaslik('6) VERİLERİN AKTARILMASI'));
+  c.push(rzP('İŞVEREN, kişisel verileri; Kanun\'un 8. ve 9. maddelerine uygun olarak ve işleme amaçlarıyla sınırlı kalmak üzere; SGK, Maliye, İŞKUR, Çalışma ve Sosyal Güvenlik Bakanlığı, TÜİK, vergi daireleri, adli ve idari merciler gibi kanunen yetkili kamu kurum ve kuruluşlarına; iş sağlığı ve güvenliği hizmeti veren işyeri hekimi ve iş güvenliği uzmanı ile sağlık kuruluşlarına; İŞVEREN\'in hukuki, mali müşavirlik ve muhasebe hizmetlerini sunan meslek mensuplarına; bankalara, BES ve sigorta şirketlerine; yetkili insan kaynakları personeline; bilişim, bulut, yedekleme ve barındırma hizmeti sağlayan hizmet sağlayıcılara aktarabilir. Verilerin yurt dışına aktarılmasının gerekmesi hâlinde (örneğin yurt dışında bulunan bulut sunucu hizmetleri) bu aktarım, Kanun\'un 9. maddesine uygun olarak yapılır ve İŞÇİ bu konuda ayrıca bilgilendirilir.'));
+  c.push(rzP('Özel nitelikli kişisel veriler, kanunda öngörülen hâller ile bu beyan çerçevesinde yetkili kamu kurumları, iş yeri hekimi ve ilgili hizmet sağlayıcılar dışındaki üçüncü kişilerle paylaşılmaz.',{after:60}));
+  c.push(rzBaslik('7) SAKLAMA, GÜVENLİK VE İMHA'));
+  c.push(rzP('Veriler kâğıt ortamında, elektronik ortamda, elektronik araçlarda (bilgisayar, harddisk, flash bellek, sunucu vb.) ve sanal ortamlarda (internet, bulut sistemleri) saklanabilir ve işlenebilir. İŞVEREN, Kanun\'un 12. maddesi uyarınca verilerin hukuka aykırı işlenmesini, erişilmesini ve kaybolmasını önlemek için gerekli idari, teknik ve hukuki tedbirleri alır; yalnızca yetkili kişilerin erişimine izin verir. Veriler, ilgili kanunlarda öngörülen saklama süreleri (iş ilişkisinin sona ermesinden itibaren özlük dosyası için en az on yıl dâhil) ve zamanaşımı süreleri boyunca muhafaza edilir; sürelerin dolmasından sonra Kişisel Verilerin Silinmesi, Yok Edilmesi veya Anonim Hâle Getirilmesi Hakkında Yönetmelik\'e uygun olarak kâğıt, elektronik ve sanal ortamlardan silinir, yok edilir veya anonim hâle getirilir.'));
+  c.push(rzBaslik('8) İŞÇİ\'NİN YÜKÜMLÜLÜKLERİ VE HAKLARI'));
+  c.push(rzMadde('8.1','İŞÇİ, verdiği bilgilerin doğru, eksiksiz ve güncel olduğunu; adres, medeni hâl, aile, banka, iletişim ve benzeri bilgilerindeki değişiklikleri gecikmeksizin İŞVEREN\'e bildireceğini; eksik veya yanlış bilgi verilmesinden doğacak sonuçlardan kendisinin sorumlu olduğunu kabul eder.'));
+  c.push(rzMadde('8.2','İŞÇİ, Kanun\'un 11. maddesi uyarınca; verilerinin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, işlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme, aktarıldığı üçüncü kişileri bilme, eksik veya yanlış işlenmişse düzeltilmesini isteme, Kanun\'daki şartlar çerçevesinde silinmesini veya yok edilmesini isteme ve zarara uğraması hâlinde zararın giderilmesini talep etme haklarına sahiptir; bu haklarını İŞVEREN\'e yazılı başvuru ile kullanabilir.'));
+  c.push(rzMadde('8.3','İŞÇİ, açık rızasını dilediği zaman İŞVEREN\'e bildirerek geri alabilir. Rızanın geri alınması ileriye etkilidir; kanuni yükümlülüklere ve sözleşmenin ifasına dayanan veri işleme faaliyetlerini, geçmişte hukuka uygun olarak yapılmış işlemleri ve yasal saklama zorunluluklarını etkilemez.'));
+  c.push(rzBaslik('9) ONAY'));
+  c.push(rzP('İŞÇİ, işbu beyandaki tüm maddelerin kendisine okunduğunu ve izah edildiğini, içeriğini tamamen anladığını; bu beyanı hiçbir baskı altında kalmaksızın, özgür iradesiyle verdiğini ve yukarıda yazılı tüm kişisel verilerinin ve özel nitelikli kişisel verilerinin belirtilen amaç, yöntem ve kapsamda işlenmesine, kaydedilmesine, saklanmasına, aktarılmasına ve devredilmesine açık rıza gösterdiğini kabul ve beyan eder. İşbu beyan '+giris+' tarihinde iki nüsha olarak düzenlenmiş ve imza altına alınmıştır.',{before:20,after:200}));
+  c.kolonSon=c.length;
+  c.kvkkKol=true;
+  const kol={type:docx.TabStopType.RIGHT,position:10300};
+  c.push(P({spacing:{before:120,after:0},keepNext:true,tabStops:[kol],children:[TR({text:'İŞÇİ',font:FONT,size:21,bold:true}),TR({text:'\tİŞVEREN',font:FONT,size:21,bold:true})]}));
+  c.push(P({spacing:{before:40,after:0},keepNext:true,tabStops:[kol],children:[TR({text:ad,font:FONT,size:20}),TR({text:'\t'+FIRMA.unvan,font:FONT,size:20})]}));
+  c.push(P({spacing:{before:560,after:0},tabStops:[kol],children:[TR({text:'İmza: ………………………………',font:FONT,size:20}),TR({text:'\tKaşe / İmza: ………………………………',font:FONT,size:20})]}));
   return c;
 }
 
@@ -7736,7 +7788,7 @@ window.v134DisciplineRender=function(){
    (tarih/ihbar düzeltmeleri, sözleşme metinleri ve ölü kod temizliği doğrudan
    ilgili fonksiyonlarda yapıldı; bu blok yalnızca yeni akışları içerir)
    ===================================================================== */
-const APP_SURUM = 'v2.0 · 06.11.2026 · Masaüstü';
+const APP_SURUM = 'v2.1 · 06.11.2026 · Masaüstü';
 
 function v14IsGunuEkle(iso,n){
   const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||''); if(!m) return null;
