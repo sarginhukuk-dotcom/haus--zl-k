@@ -2070,7 +2070,7 @@ async function docxBlob(children){
   } else if(!tasarruf){
     sections=[{ properties: sayfaAyari(), children }];
   } else {
-    const margin={top:850,bottom:850,left:1134,right:1134};
+    const margin={top:760,bottom:760,left:1134,right:1134};
     const bas=children.kolonBas, son=children.kolonSon;
     if(Number.isInteger(bas)&&Number.isInteger(son)&&bas<son){
       const arr=Array.from(children);
@@ -9863,5 +9863,12 @@ window.balaFikriHaklar=fikriHaklarEki;
 @media(max-width:820px){nav.tabs button.v209-cta,nav.tabs button.v209-cta.active{background:linear-gradient(180deg,#434a52 0%,#2c3238 55%,#23282d 100%)!important;color:#f4f5f6!important}}
 nav.tabs .v220-strip button.v209-cta,nav.tabs .v220-strip button.v209-cta *{color:#f4f5f6!important}
 </style>
+<script id="v20-tasarruf">
+/* Kâğıt tasarrufu: taşma yapan belgeleri tek sayfaya toplamak için 10,5 punto (içerik değişmez) */
+(function(){['isBasvuruBelgesi','isKazasiBildirimTutanagi','gorevDegisiklikOnayFormu','ikaleSozlesmesi','fesihBildirimi','sehirDisiGorevlendirmeFormu'].forEach(function(n){
+  var o=window[n]; if(typeof o!=='function')return;
+  window[n]=function(){var a=arguments,t=this;return szSar(function(){return o.apply(t,a)},20)};
+});})();
+</script>
 </body>
 </html>
