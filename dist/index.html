@@ -2236,7 +2236,7 @@ function bfIki(a,b){
 function bfDil(){
   return P({tabStops:[{type:docx.TabStopType.LEFT,position:2200},{type:docx.TabStopType.LEFT,position:4700,leader:docx.LeaderType.UNDERSCORE},{type:docx.TabStopType.LEFT,position:5000}],spacing:{before:Math.round(70*SK),after:Math.round(90*SK)},children:[TR({text:'Yabancı dil',bold:true,font:FONT,size:SZ}),TR({text:'\t\t',font:FONT,size:SZ}),TR({text:' ',font:FONT,size:SZ}),TR({text:'\t☐ Başlangıç  ☐ Orta  ☐ İyi  ☐ Çok iyi',font:FONT,size:SZ})]});
 }
-function isBasvuruBelgesi(opts){ return szSar(()=>isBasvuruBelgesi0(opts),21,0.8); }
+function isBasvuruBelgesi(opts){ return szSar(()=>isBasvuruBelgesi0(opts),22,0.75); }
 function isBasvuruBelgesi0(opts){
   const c=[]; const eposta=FIRMA.eposta||'';
   c.push(P({alignment:docx.AlignmentType.CENTER,spacing:{after:20},children:[TR({text:FIRMA.unvan,font:FONT,size:SZ,bold:true})]}));
@@ -2280,6 +2280,7 @@ function isBasvuruBelgesi0(opts){
   c.push(bfSatir('Ayrılma süreniz','Başlama tarihi'));
   c.push(bfSatir('Talep edilen net ücret'));
   c.push(P({spacing:{before:30,after:60},children:[TR({text:'Sağlık sorusuna yanıt, yalnızca işe uygunluğun ve iş sağlığı ve güvenliği tedbirlerinin belirlenmesi için değerlendirilir; ayrıntı bu aşamada istenmez, işe kabulde işyeri hekimi muayenesi yapılır.',italics:true,font:FONT,size:SZ-2})]}));
+  SZ=26; SK=1.9; /* 2. sayfa: yazı büyütülerek sayfa dolduruldu */
   if(opts.kurallar){
     c.push(bfBaslik('İŞYERİ TEMEL KURALLARI VE ÖN BİLGİLENDİRME',true));
     c.push(bent('1','Çalışma düzeni işin ve işletmenin ihtiyacına göre vardiyalı olarak planlanabilir; ilan edilen çalışma ve vardiya saatlerine uyulması beklenir.'));
@@ -2379,29 +2380,6 @@ async function isBasvuruBelgesiIndir(){
   toast('İş başvuru belgesi hazırlandı.');
 }
 
-function basvuruFormu(p){
-  const c = [];
-  c.push(baslik('İŞE BAŞVURU VE İŞYERİ KURALLARI BİLGİLENDİRME FORMU', {after:60}));
-  c.push(baslik(FIRMA.unvan, {after:200, size:SZ}));
-  c.push(kunye('Adı Soyadı', adTitle(p.ad)));
-  c.push(kunye('Telefon', p.tel||'……………………………………………'));
-  c.push(kunye('Başvurulan Görev', gorevLabel(p)));
-  c.push(kunye('Ne Zaman Başlayabilir', trTarih(p.giris)));
-  c.push(...bos(1));
-  c.push(altBaslik('İŞYERİMİZİN TEMEL ÇALIŞMA KURALLARI'));
-  c.push(bent('1','Çalışma düzeni vardiya esasına göredir; vardiya çizelgesi işyeri tarafından belirlenir ve önceden bildirilir.'));
-  c.push(bent('2','İşe kabul edilen personel için 2 (iki) aylık kanuni deneme süresi uygulanır.'));
-  c.push(bent('3','Üretim ve montaj biriminde çalışacak personel için iş sağlığı ve güvenliği kurallarına ve makine güvenliği talimatlarına tam uyum esastır.'));
-  c.push(bent('4','İşyerinin belirlediği iş kıyafeti ve kişisel koruyucu donanım kurallarına uyulması gerekmektedir.'));
-  c.push(bent('5','İşyeri sırlarının gizliliği esastır; bu konudaki yükümlülükler ilgili sözleşmelerde ayrıca düzenlenir.'));
-  c.push(bent('6','Devamsızlık ve mazeret bildirimleri işyeri amirine en kısa sürede yapılmalıdır.'));
-  c.push(bent('7','İşyerinde sigara/alkol/uyuşturucu madde kullanımı mevzuata tabidir.'));
-  c.push(...bos(1));
-  c.push(govde('Yukarıdaki bilgilendirmeyi okuduğumu ve anladığımı, bu formda verdiğim bilgilerin doğru olduğunu beyan ederim.', {girinti:false}));
-  c.push(...bos(2));
-  c.push(imzaSatiri('Tarih: ……/……/……………','Adı Soyadı / İmza'));
-  return c;
-}
 
 function fazlaMesaiOnay(p){
   const c = [];
@@ -3289,7 +3267,7 @@ function isyeriIcYonetmeligiTamMetin0(){
   c.push(govde('Personel, özlük dosyasında yer alan bilgilerde meydana gelecek değişiklikleri (adres, iletişim bilgisi, medeni hâl, sağlık durumunda işe etki eden değişiklik vb.) en geç 1 (bir) hafta içinde yazılı olarak Şirkete bildirmekle yükümlüdür. Bildirilmeyen adres değişikliğinde, özlük dosyasındaki adres yasal tebligat adresi sayılır.', { girinti:false }));
 
   c.push(maddeBaslik('MADDE 5) İŞE ALINMA'));
-  c.push(bent('a', 'İşe alımlarda insan kaynakları temel ilkeleri esastır. Aday, İşe Başvuru ve Bilgilendirme Formu\'nu doldurur ve verdiği bilgilerin doğruluğundan sorumludur.'));
+  c.push(bent('a', 'İşe alımlarda insan kaynakları temel ilkeleri esastır. Aday, İş Başvuru Formu\'nu doldurur ve verdiği bilgilerin doğruluğundan sorumludur.'));
   c.push(bent('b', 'Üretim veya montaj biriminde görevlendirilecek personel, 6331 sayılı Kanun\'un 17/3. maddesi uyarınca yapacağı işle ilgili mesleki eğitim aldığını belgeleyemediği takdirde çalıştırılamaz. Bu belge, işe başlatmanın ön şartıdır.'));
   c.push(bent('c', 'Personel, 6331 sayılı Kanun\'un 15/2. maddesi uyarınca yapacağı işe uygun olduğunu belirten sağlık raporu alınmadan işe başlatılamaz.'));
   c.push(bent('d', 'Adli sicil kaydı, yalnızca yapılacak işin niteliği gereği kanunen arandığı hâllerde istenir; bunun dışında işe alım kriteri olarak kullanılamaz.'));
@@ -3787,7 +3765,6 @@ async function iseAlimPaketi(p,secim,yenidenHazirla){
   if(sec('kvkkRiza'))await ekle('KVKK_Acik_Riza_Beyani',kvkkAcikRiza(p));
   if(sec('zimmet')&&p.zimmetler&&p.zimmetler.length)await ekle('Zimmet_Teslim_Tutanagi',zimmetTeslimTutanagi(p));
   if(sec('ozluk'))await ekle('Ozluk_Dosyasi_Kontrol_Listesi',ozlukListesi(p));
-  if(yenidenHazirla)await ekle('Basvuru_Kurallar_Formu',basvuruFormu(p));
   return {zip,taban,blob:await zip.generateAsync({type:'blob'})};
 }
 /* Alan doğrulaması: uyarı verir, geçerliyse true döner. */
