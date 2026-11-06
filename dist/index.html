@@ -1868,7 +1868,8 @@ function toast(msg){
    ===================================================================== */
 const FONT = 'Times New Roman';
 let SZ = 24; // 12pt (kâğıt tasarrufu modunda iki sütunlu belgelerde geçici olarak 10pt)
-function szSar(fn,boyut){const eski=SZ;if(FIRMA.tasarruf!==false)SZ=boyut;try{return fn()}finally{SZ=eski}}
+let SK=1; /* boşluk ölçeği */
+function szSar(fn,boyut,olcek){const eski=SZ,eskiK=SK;if(FIRMA.tasarruf!==false){SZ=boyut;SK=olcek||1}try{return fn()}finally{SZ=eski;SK=eskiK}}
 const TAB_POS = 3300;
 
 function P(opts){ return new docx.Paragraph(opts); }
@@ -1889,38 +1890,38 @@ function baslik(text, opts){
   opts = opts||{};
   return P({
     alignment: docx.AlignmentType.CENTER,
-    spacing: {after: opts.after!==undefined?opts.after:120},
+    spacing: {after: opts.after!==undefined?Math.round(opts.after*SK):Math.round(120*SK)},
     children: [TR({text, bold:true, font:FONT, size:opts.size||SZ})]
   });
 }
 function maddeBaslik(text){
-  return P({ spacing:{before:240, after:120}, children:[TR({text, bold:true, font:FONT, size:SZ})] });
+  return P({ spacing:{before:Math.round(240*SK), after:Math.round(120*SK)}, keepNext:true, children:[TR({text, bold:true, font:FONT, size:SZ})] });
 }
 function altBaslik(text){
-  return P({ spacing:{before:180, after:100}, children:[TR({text, bold:true, underline:{}, font:FONT, size:SZ})] });
+  return P({ spacing:{before:Math.round(180*SK), after:Math.round(100*SK)}, keepNext:true, children:[TR({text, bold:true, underline:{}, font:FONT, size:SZ})] });
 }
 function govde(text, opts){
   opts = opts||{};
   return P({
     alignment: docx.AlignmentType.JUSTIFIED,
-    indent: {firstLine: opts.girinti===false?0:420},
-    spacing: {after:120},
+    indent: {firstLine: opts.girinti===false?0:Math.round(420*(SK<1?0.6:1))},
+    spacing: {after:Math.round(120*SK)},
     children: [TR({text, font:FONT, size:SZ})]
   });
 }
 function bent(harf, text){
   return P({
     alignment: docx.AlignmentType.JUSTIFIED,
-    indent: {left:700, hanging:420},
-    spacing: {after:100},
+    indent: {left:Math.round(700*(SK<1?0.6:1)), hanging:Math.round(420*(SK<1?0.6:1))},
+    spacing: {after:Math.round(100*SK)},
     children: [TR({text:harf+') ', font:FONT, size:SZ}), TR({text, font:FONT, size:SZ})]
   });
 }
 function madde(text){
   return P({
     alignment: docx.AlignmentType.JUSTIFIED,
-    indent: {left:700, hanging:420},
-    spacing: {after:80},
+    indent: {left:Math.round(700*(SK<1?0.6:1)), hanging:Math.round(420*(SK<1?0.6:1))},
+    spacing: {after:Math.round(80*SK)},
     children: [TR({text:'•\t', font:FONT, size:SZ}), TR({text, font:FONT, size:SZ})]
   });
 }
@@ -1941,8 +1942,8 @@ function tebligSatiri(children){
 function kutu(text){
   return P({
     alignment: docx.AlignmentType.JUSTIFIED,
-    indent: {left:700, hanging:420},
-    spacing: {after:100},
+    indent: {left:Math.round(700*(SK<1?0.6:1)), hanging:Math.round(420*(SK<1?0.6:1))},
+    spacing: {after:Math.round(100*SK)},
     children: [TR({text:'☐\t', font:FONT, size:SZ}), TR({text, font:FONT, size:SZ})]
   });
 }
@@ -2070,7 +2071,7 @@ async function docxBlob(children){
   } else if(!tasarruf){
     sections=[{ properties: sayfaAyari(), children }];
   } else {
-    const margin={top:760,bottom:760,left:1134,right:1134};
+    const margin={top:680,bottom:680,left:1000,right:1000};
     const bas=children.kolonBas, son=children.kolonSon;
     if(Number.isInteger(bas)&&Number.isInteger(son)&&bas<son){
       const arr=Array.from(children);
@@ -3205,7 +3206,7 @@ function satinAlmaTalepFormu(p){
 /* =====================================================================
    İŞYERİ İÇ YÖNETMELİĞİ — TAM METİN (firma geneli, personelsiz)
    ===================================================================== */
-function isyeriIcYonetmeligiTamMetin(){return szSar(isyeriIcYonetmeligiTamMetin0,20)}
+function isyeriIcYonetmeligiTamMetin(){return szSar(isyeriIcYonetmeligiTamMetin0,19,0.35)}
 function isyeriIcYonetmeligiTamMetin0(){
   const c = [];
   c.push(baslik('İŞYERİ İÇ YÖNETMELİĞİ', { after:60 }));
@@ -9839,9 +9840,9 @@ function icYonTebellug(p){
 }
 window.balaIcYonTebellug=icYonTebellug;
 {const _s=sozlesmeOlustur,_g=gizlilikOlustur,_f=fikriHaklarEki;
-sozlesmeOlustur=function(p){return szSar(()=>_s(p),20)};
-gizlilikOlustur=function(p){return szSar(()=>_g(p),20)};
-fikriHaklarEki=function(p){return szSar(()=>_f(p),20)};}
+sozlesmeOlustur=function(p){return szSar(()=>_s(p),20,0.5)};
+gizlilikOlustur=function(p){return szSar(()=>_g(p),20,0.5)};
+fikriHaklarEki=function(p){return szSar(()=>_f(p),20,0.5)};}
 window.balaSozlesme=sozlesmeOlustur;
 window.balaGizlilik=gizlilikOlustur;
 window.balaFikriHaklar=fikriHaklarEki;
