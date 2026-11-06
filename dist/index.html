@@ -1928,7 +1928,8 @@ function madde(text){
 function imzaSatiri(sol, sag){
   return P({
     tabStops:[{type:docx.TabStopType.RIGHT, position:9000}],
-    spacing:{before:480},
+    spacing:{before:Math.round(480*(SK<1?0.5:1))},
+    keepNext:false,
     children:[TR({text:sol, bold:true, font:FONT, size:SZ}), TR({text:'\t'+sag, bold:true, font:FONT, size:SZ})]
   });
 }
@@ -3206,7 +3207,7 @@ function satinAlmaTalepFormu(p){
 /* =====================================================================
    İŞYERİ İÇ YÖNETMELİĞİ — TAM METİN (firma geneli, personelsiz)
    ===================================================================== */
-function isyeriIcYonetmeligiTamMetin(){return szSar(isyeriIcYonetmeligiTamMetin0,19,0.35)}
+function isyeriIcYonetmeligiTamMetin(){return szSar(isyeriIcYonetmeligiTamMetin0,19,0.25)}
 function isyeriIcYonetmeligiTamMetin0(){
   const c = [];
   c.push(baslik('İŞYERİ İÇ YÖNETMELİĞİ', { after:60 }));
@@ -3226,11 +3227,10 @@ function isyeriIcYonetmeligiTamMetin0(){
   c.push(maddeBaslik('MADDE 3) ÖZLÜK DOSYALARI'));
   c.push(govde('Her personel için bir özlük dosyası tutulur. Özlük dosyasında bulunması gereken belgeler, işbu yönetmeliğin eki olan Özlük Dosyası Kontrol Listesi\'nde düzenlenmiştir.', { girinti:false }));
   c.push(govde('İşyerimizde, üretim ve montaj biriminde görevlendirilecek personel bakımından aşağıdaki belgelerin özlük dosyasında bulunması zorunludur:', { girinti:false }));
-  c.push(bent('a', '6331 sayılı Kanun\'un 17/3. maddesi uyarınca, yapacağı işe ilişkin mesleki eğitim aldığını gösteren belge (Mesleki Yeterlilik Kurumu belgesi, kaynakçı sertifikası, mesleki/teknik eğitim diploması veya kurs bitirme belgesi),'));
-  c.push(bent('b', '6331 sayılı Kanun\'un 15/2. maddesi uyarınca, yapacağı işe uygun olduğunu belirten işe giriş sağlık raporu,'));
-  c.push(bent('c', 'İş sağlığı ve güvenliği eğitimlerine katılım belgeleri ile makine başı eğitim tutanakları,'));
-  c.push(bent('d', 'Kişisel koruyucu donanım teslim tutanağı,'));
-  c.push(bent('e', 'İş ekipmanı kullanma yetki belgesi (forklift, vinç, transpalet vb. kullanacak personel için).'));
+  c.push(bent('a', '6331 sayılı Kanun\'un 17/3 ve 15/2. maddeleri uyarınca, yapacağı işe ilişkin mesleki eğitim aldığını gösteren belge (Mesleki Yeterlilik Kurumu belgesi, kaynakçı sertifikası, mesleki/teknik eğitim diploması veya kurs bitirme belgesi) ile işe giriş sağlık raporu,'));
+  c.push(bent('b', 'İş sağlığı ve güvenliği eğitimlerine katılım belgeleri ile makine başı eğitim tutanakları,'));
+  c.push(bent('c', 'Kişisel koruyucu donanım teslim tutanağı,'));
+  c.push(bent('d', 'İş ekipmanı kullanma yetki belgesi (forklift, vinç, transpalet vb. kullanacak personel için).'));
   c.push(govde('Özlük dosyaları, Şirket yetkilisinin izni olmaksızın, denetim yetkisini kanunen haiz kişi ve kurumlar dışında kimseye gösterilemez.', { girinti:false }));
 
   c.push(maddeBaslik('MADDE 4) DEĞİŞİKLİKLERİN BİLDİRİLMESİ'));
@@ -3318,7 +3318,6 @@ function isyeriIcYonetmeligiTamMetin0(){
   c.push(bent('b', 'Boyahane personeli solunum koruyucu, kimyasal dayanımlı eldiven, gözlük ve koruyucu giysi kullanmadan çalışamaz; kabin, emiş ve havalandırma donanımları devre dışı bırakılamaz; boya ve kimyasal atıkları belirlenen şekilde ayrılır.'));
   c.push(altBaslik('9/F) Bakım, Onarım ve Enerji İzolasyonu'));
   c.push(bent('a', 'Bakım ve onarım çalışmalarında enerji kesme, kilitleme ve etiketleme prosedürü uygulanır; enerjili ve korumasız çalışma yapılamaz; bakım sonrası makine koruyucuları yerine takılmadan makine çalıştırılamaz.'));
-  c.push(bent('b', 'Depo, istif ve sevkiyat işlerinde forklift ve kaldırma ekipmanı yalnızca yetki belgesi olan personelce kullanılır; yük altında çalışılmaz, istif yüksekliği ve yük kapasitesi aşılamaz.'));
 
   c.push(maddeBaslik('MADDE 10) GÖRÜNÜM VE GİYİM DÜZENİ'));
   c.push(govde('Personel, görevine ve işyerinin niteliğine uygun, temiz ve düzenli giyinmekle yükümlüdür. Üretim ve montaj biriminde çalışan personel, iş kıyafeti ve Şirketçe belirlenen kişisel koruyucu donanımı kullanmak zorundadır. Dönen aksamlı tezgâhlarda çalışan personel, sıkışma riski nedeniyle bol kıyafet, kolye, yüzük, bileklik ve benzeri takı kullanamaz; uzun saçlar toplanır.', { girinti:false }));
@@ -3332,7 +3331,7 @@ function isyeriIcYonetmeligiTamMetin0(){
   c.push(bent('f', 'Personel, mesai saatleri içinde ve özellikle üretim tesisleri içinde, işin gerekleri dışında telefon, tablet ve benzeri cihazlarla ilgilenemez. Bu yasak, dikkat dağınıklığının ağır iş kazalarına yol açma riski nedeniyle iş güvenliği kuralı niteliğindedir.'));
 
   c.push(bent('g', 'İşyerinden izinsiz mal, malzeme, hurda veya belge çıkarılamaz; Şirket malzemesi kişisel amaçla kullanılamaz.'));
-  c.push(bent('h', 'İzinsiz ziyaretçi veya yabancı kişi, üretim alanlarına ve depolara alınamaz.'));
+  c.push(bent('h', 'İzinsiz ziyaretçi veya yabancı kişi, üretim alanlarına ve depolara alınamaz; izinle girenlere kişisel koruyucu donanım temin edilir.'));
   c.push(bent('ı', 'İşyerinde kavga, hakaret, tehdit, taciz ve şiddet davranışları yasaktır.'));
   c.push(bent('i', 'Personel, Şirket adına yetkisiz borçlanma, sipariş veya taahhütte bulunamaz.'));
 
@@ -3353,7 +3352,6 @@ function isyeriIcYonetmeligiTamMetin0(){
   c.push(bent('f', 'Personel, önceden bildirilmek kaydıyla ulusal bayram ve genel tatil günlerinde çalışabilir; bu çalışmaların ücreti mevzuata göre ödenir.'));
   c.push(bent('g', 'Zorunlu nedenlerle işin durması hâlinde, 4857 sayılı Kanun\'un 64. maddesi kapsamında telafi çalışması yaptırılabilir; bu çalışmalar fazla mesai sayılmaz.'));
   c.push(bent('h', 'İşyerinde sigara içilmesi 4207 sayılı Kanun ile belirlenen alan ve kısıtlamalara tabidir. Yanıcı, parlayıcı veya patlayıcı madde bulunan ve iş güvenliği bakımından sigara içilmesi yasaklanan alanlarda (boyahane, kaynak/kesim bölümleri, depo vb.) sigara içilmesi mutlak surette yasaktır; bu alanlarda ilk ihlalde dahi Şirket 4857 sayılı Kanun\'un 25/II maddesi kapsamında sözleşmeyi derhâl ve tazminatsız feshedebilir.'));
-  c.push(bent('ı', 'Personel, izin ve onay almadıkça üretim alanlarına ziyaretçi kabul edemez; üretim alanına giren ziyaretçilere kişisel koruyucu donanım temin edilir.'));
   c.push(bent('i', 'Personel, işyeri bilgisayar ve internet erişimini iş amacı dışında kullanamaz.'));
   c.push(bent('j', 'Ücrete yapılacak zam, performans ve sicile göre Şirketçe belirlenir; genel zam uygulamasından yararlanamayan personel bir hak iddia edemez.'));
 
@@ -3386,7 +3384,7 @@ function isyeriIcYonetmeligiTamMetin0(){
   c.push(bent('a', 'İşbu yönetmelik, Şirketin tüm personeli için bağlayıcıdır ve her personelin iş sözleşmesinin ekidir. Yönetmelik, işe girişte her personele yazılı olarak teslim edilir ve personel, "İç Yönetmelik Tebellüğ ve Kabul Belgesi"ni imzalar; belge özlük dosyasında saklanır. Mevcut personelden de aynı belge alınır.'));
   c.push(bent('b', 'Yönetmelikte düzenlenmeyen hususlarda 4857 sayılı İş Kanunu, 6331 sayılı İş Sağlığı ve Güvenliği Kanunu, 6698 sayılı KVKK ve ilgili mevzuat hükümleri uygulanır; bu mevzuatın emredici hükümleri bu yönetmeliğin hükümlerinden önce gelir.'));
   c.push(bent('c', 'Şirket, mevzuat değişikliği ve işyeri koşullarına göre yönetmelikte değişiklik yapabilir. Değişiklik sürüm numarası ve yürürlük tarihiyle personele yazılı/dijital olarak bildirilir veya işyerinde ilan edilir ve bildirim/ilan tarihinde yürürlüğe girer; personelin çalışma koşullarında esaslı değişiklik oluşturan hâllerde 4857 sayılı Kanun\'un 22. maddesi saklıdır. Güncel sürüm için personelden yeniden tebellüğ belgesi alınır. Personelin imzadan kaçınması hâlinde bildirim tutanakla tespit edilir ve yönetmelik tebliğ edilmiş sayılır.'));
-  c.push(bent('d', 'Yönetmelik hükümlerine aykırılık, iş sözleşmesine aykırılık sayılır ve Madde 13\'te düzenlenen disiplin usulüne göre değerlendirilir; Şirketin kanundan doğan fesih hakları saklıdır. İşbu yönetmelik 14 madde ile 11/A maddesinden ibarettir.'));
+  c.push(bent('d', 'Yönetmelik hükümlerine aykırılık, iş sözleşmesine aykırılık sayılır ve Madde 13\'te düzenlenen disiplin usulüne göre değerlendirilir; Şirketin kanundan doğan fesih hakları saklıdır.'));
 
   c.kolonSon=c.length;
   c.push(...bos(1));
